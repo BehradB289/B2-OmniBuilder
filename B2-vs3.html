@@ -1,0 +1,2320 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>B2. Omni-Builder | Advanced Enterprise Framework</title>
+
+    <!-- Core Libs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Expanded Premium Font Registry -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- External Utilities -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+      /* CYBERPUNK & IDE PREMIUM THEME ENGINE */
+      :root {
+        --sidebar-w: 520px;
+        --bg-master: #03050a;
+        --bg-sidebar: #0b0f19;
+        --bg-panel: #141b2d;
+        --accent: #f43f5e;
+        --accent-hover: #e11d48;
+        --accent-cyan: #0ea5e9;
+        --accent-glow: rgba(244, 63, 94, 0.4);
+        --cyan-glow: rgba(14, 165, 233, 0.3);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+        --border-focus: rgba(14, 165, 233, 0.5);
+      }
+
+      body {
+        font-family: "Inter", "Plus Jakarta Sans", sans-serif;
+        background: var(--bg-master);
+        color: var(--text-main);
+        overflow: hidden;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-master);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 10px;
+        border: 1px solid var(--bg-master);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-cyan);
+      }
+
+      /* Layout Skeleton */
+      .app-layout {
+        display: flex;
+        height: 100vh;
+        background: var(--bg-master);
+      }
+
+      .sidebar {
+        width: var(--sidebar-w);
+        background: var(--bg-sidebar);
+        border-right: var(--border-glass);
+        display: flex;
+        flex-direction: column;
+        z-index: 30;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.95);
+      }
+      .app-layout.fullscreen .sidebar {
+        margin-left: calc(var(--sidebar-w) * -1);
+      }
+
+      /* Atomic Form Elements */
+      .lbl {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        margin-bottom: 0.4rem;
+        font-weight: 700;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .inp {
+        width: 100%;
+        background: var(--bg-master);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-main);
+        padding: 0.6rem 0.85rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .inp:focus {
+        border-color: var(--accent-cyan);
+        box-shadow:
+          0 0 12px var(--cyan-glow),
+          inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      select.inp {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230ea5e9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1em;
+      }
+      input[type="range"] {
+        accent-color: var(--accent-cyan);
+        width: 100%;
+        height: 4px;
+        background: var(--bg-master);
+        border-radius: 2px;
+        outline: none;
+        -webkit-appearance: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px var(--cyan-glow);
+        transition: 0.2s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+      input[type="color"] {
+        -webkit-appearance: none;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        cursor: pointer;
+        padding: 0;
+        background: transparent;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      input[type="color"]::-webkit-color-swatch {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 20px;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: var(--bg-master);
+        transition: 0.4s;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 2px;
+        bottom: 2px;
+        background-color: var(--text-muted);
+        transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--accent-cyan);
+        border-color: var(--accent-cyan);
+      }
+      input:checked + .slider:before {
+        transform: translateX(16px);
+        background-color: #fff;
+        box-shadow: 0 0 8px #fff;
+      }
+
+      .action-btn {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-panel);
+        color: var(--text-muted);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .action-btn:hover {
+        background: var(--accent-cyan);
+        color: #fff;
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 12px var(--cyan-glow);
+      }
+
+      /* Cyber Tabs */
+      .tabs {
+        display: flex;
+        background: var(--bg-master);
+        padding: 6px;
+        margin: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .tab {
+        padding: 10px;
+        text-align: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        border-radius: 6px;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        white-space: nowrap;
+        flex: 1;
+        letter-spacing: 0.05em;
+      }
+      .tab:hover {
+        color: var(--text-main);
+      }
+      .tab.active {
+        background: rgba(14, 165, 233, 0.1);
+        color: var(--accent-cyan);
+        box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.3);
+      }
+
+      /* Layers System */
+      .layer {
+        background: var(--bg-panel);
+        padding: 0.85rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        transition: 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .layer::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: transparent;
+        transition: 0.3s;
+      }
+      .layer:hover {
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+      .layer.active {
+        border-color: rgba(14, 165, 233, 0.3);
+        background: rgba(14, 165, 233, 0.02);
+      }
+      .layer.active::before {
+        background: var(--accent-cyan);
+        box-shadow: 0 0 10px var(--accent-cyan);
+      }
+
+      /* Canvas Physics */
+      .device-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        perspective: 2500px;
+        padding: 2rem;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: radial-gradient(circle at center, #0f172a 0%, #03050a 100%);
+      }
+      .device-frame {
+        background: var(--bg-master);
+        margin: auto;
+        transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.8);
+        position: relative;
+        z-index: 10;
+        display: flex;
+      }
+      .device-frame.desktop {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+      .device-frame.tablet {
+        width: 768px;
+        height: 1024px;
+        max-height: 95%;
+        border-radius: 24px;
+        border: 14px solid #090e1a;
+      }
+      .device-frame.mobile {
+        width: 390px;
+        height: 844px;
+        max-height: 90%;
+        border-radius: 40px;
+        border: 14px solid #090e1a;
+      }
+
+      /* Overlays */
+      .modal-bg {
+        background: rgba(3, 5, 10, 0.95);
+        backdrop-filter: blur(16px);
+      }
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(120px);
+        z-index: 9999;
+        background: var(--bg-panel);
+        border: 1px solid var(--accent-cyan);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px var(--cyan-glow);
+        font-size: 0.8rem;
+        font-weight: 600;
+        opacity: 0;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+
+      .code-editor {
+        font-family: "Fira Code", monospace;
+        background: #000;
+        color: #38bdf8;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #1e293b;
+        width: 100%;
+        min-height: 150px;
+        font-size: 0.75rem;
+        outline: none;
+      }
+      .code-editor:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
+      }
+
+      #boot-loader {
+        position: fixed;
+        inset: 0;
+        background: var(--bg-master);
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-cyan);
+        transition: opacity 0.5s ease;
+      }
+      .loader-ring {
+        width: 60px;
+        height: 60px;
+        border: 3px solid rgba(14, 165, 233, 0.1);
+        border-top-color: var(--accent-cyan);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px var(--cyan-glow);
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .custom-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-cyan);
+      }
+
+      /* Preset theme buttons */
+      .preset-btn {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s;
+        overflow: hidden;
+        position: relative;
+      }
+      .preset-btn:hover {
+        border-color: var(--accent-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--cyan-glow);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- System Boot Screen -->
+    <div id="boot-loader">
+      <div class="loader-ring"></div>
+      <div
+        class="font-mono text-sm tracking-widest uppercase animate-pulse text-sky-400"
+      >
+        Initializing Omni-Builder Matrix...
+      </div>
+    </div>
+
+    <!-- Main Workspace Layout -->
+    <div class="app-layout" id="app">
+      <!-- COGNITIVE SIDEBAR -->
+      <aside class="sidebar">
+        <!-- Header -->
+        <div
+          class="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-[var(--bg-sidebar)]"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 rounded bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(14,165,233,0.5)] text-xs border border-white/20"
+            >
+              B2
+            </div>
+            <div class="font-bold text-white text-sm leading-tight">
+              Omni<span class="text-sky-400">Builder</span>
+              <span
+                class="text-[9px] text-slate-500 block font-mono tracking-widest uppercase mt-0.5"
+                >Enterprise v4.0</span
+              >
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="action-btn"
+              onclick="engine.undo()"
+              title="Undo State (Ctrl+Z)"
+            >
+              <i class="fas fa-undo text-xs"></i>
+            </button>
+            <button
+              class="action-btn"
+              onclick="engine.redo()"
+              title="Redo State (Ctrl+Y)"
+            >
+              <i class="fas fa-redo text-xs"></i>
+            </button>
+            <button
+              class="action-btn hover:!bg-rose-600 hover:!border-rose-600 hover:!shadow-[0_0_15px_rgba(244,63,94,0.5)]"
+              onclick="engine.reset()"
+              title="Hard Purge & Reset"
+            >
+              <i class="fas fa-power-off text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Navigation Matrix -->
+        <div class="tabs">
+          <div
+            class="tab active"
+            onclick="ui.setTab('layout', this)"
+            title="Page Structure & Archetype"
+          >
+            <i class="fas fa-layer-group mb-1.5 block text-lg"></i>Layout
+          </div>
+          <div
+            class="tab"
+            onclick="ui.setTab('content', this)"
+            title="Component Data Values"
+          >
+            <i class="fas fa-cube mb-1.5 block text-lg"></i>Content
+          </div>
+          <div
+            class="tab"
+            onclick="ui.setTab('design', this)"
+            title="Styling, Themes & Shaders"
+          >
+            <i class="fas fa-palette mb-1.5 block text-lg"></i>Design
+          </div>
+          <div
+            class="tab"
+            onclick="ui.setTab('commerce', this)"
+            title="Transaction Router & Forms"
+          >
+            <i class="fas fa-shopping-cart mb-1.5 block text-lg"></i>Logic
+          </div>
+          <div
+            class="tab"
+            onclick="ui.setTab('seo', this)"
+            title="SEO & RTL Matrix"
+          >
+            <i class="fas fa-globe mb-1.5 block text-lg"></i>SEO
+          </div>
+          <div
+            class="tab"
+            onclick="ui.setTab('leads', this)"
+            title="Captured Telemetry"
+          >
+            <i class="fas fa-database mb-1.5 block text-lg"></i>Data
+          </div>
+        </div>
+
+        <!-- Dynamic Control Render Area -->
+        <div
+          class="flex-1 overflow-y-auto px-6 py-2 custom-scroll"
+          id="panel-content"
+        ></div>
+
+        <!-- Footer Action Telemetry -->
+        <div
+          class="p-5 border-t border-white/5 bg-[var(--bg-sidebar)] flex gap-3"
+        >
+          <button
+            class="flex-1 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 border border-white/10 text-white py-3 rounded-lg font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
+            onclick="ui.showExportModal()"
+          >
+            <i class="fas fa-code-branch text-sky-400"></i> COMPILE & DEPLOY
+          </button>
+          <button
+            class="flex-1 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white py-3 rounded-lg font-bold text-xs shadow-[0_0_20px_rgba(14,165,233,0.4)] border border-sky-400/30 transition flex items-center justify-center gap-2"
+            onclick="engine.saveProject()"
+          >
+            <i class="fas fa-save"></i> SAVE STATE
+          </button>
+        </div>
+      </aside>
+
+      <!-- LIVE CANVAS FRAMEWORK -->
+      <main class="flex-1 flex flex-col relative z-0">
+        <!-- Telemetry Topbar -->
+        <div
+          class="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-[var(--bg-master)]/80 backdrop-blur-md z-20 absolute top-0 left-0 right-0"
+        >
+          <button
+            class="action-btn !bg-transparent border-white/10 hover:!bg-white/5"
+            onclick="ui.toggleFullscreen()"
+            title="Toggle Workspace Focus"
+          >
+            <i class="fas fa-expand"></i>
+          </button>
+
+          <!-- Middle Switcher Options -->
+          <div
+            class="flex bg-[var(--bg-sidebar)] rounded-lg p-1 border border-white/10 shadow-inner"
+          >
+            <button
+              class="px-5 py-1.5 rounded text-xs text-white/40 hover:text-white hover:bg-white/5 transition"
+              onclick="ui.resize('desktop')"
+              title="Desktop"
+            >
+              <i class="fas fa-desktop"></i>
+            </button>
+            <button
+              class="px-5 py-1.5 rounded text-xs text-white/40 hover:text-white hover:bg-white/5 transition"
+              onclick="ui.resize('tablet')"
+              title="Tablet Viewport"
+            >
+              <i class="fas fa-tablet-alt"></i>
+            </button>
+            <button
+              class="px-5 py-1.5 rounded text-xs text-white/40 hover:text-white hover:bg-white/5 transition"
+              onclick="ui.resize('mobile')"
+              title="Mobile Viewport"
+            >
+              <i class="fas fa-mobile-alt"></i>
+            </button>
+          </div>
+
+          <div
+            class="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20"
+          >
+            <span
+              class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"
+            ></span>
+            OMNI-ENGINE ACTIVE
+          </div>
+        </div>
+
+        <!-- Render Target Frame -->
+        <div class="device-wrapper pt-14">
+          <div id="wrapper" class="device-frame desktop">
+            <iframe
+              id="preview"
+              class="w-full h-full border-0 bg-white"
+              title="Live Preview"
+            ></iframe>
+          </div>
+        </div>
+      </main>
+
+      <!-- Global Assets Upload Target Switcher -->
+      <div id="toast">
+        <i class="fas fa-check-circle"></i
+        ><span id="toast-msg">Operation Executed</span>
+      </div>
+      <input type="file" id="upload" class="hidden" accept="image/*" />
+
+      <!-- Export Cyber-Modal -->
+      <div
+        id="export-modal"
+        class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-10 opacity-0 transition-opacity duration-300"
+      >
+        <div
+          class="bg-[var(--bg-sidebar)] w-full max-w-5xl max-h-[90vh] rounded-2xl flex flex-col border border-white/10 shadow-[0_0_50px_rgba(14,165,233,0.15)] scale-95 transition-transform duration-300 overflow-hidden"
+          id="export-box"
+        >
+          <div
+            class="flex justify-between p-6 border-b border-white/5 bg-[var(--bg-master)]"
+          >
+            <span class="text-white font-bold text-lg flex items-center"
+              ><i class="fas fa-terminal text-sky-400 mr-3"></i> OMNI-COMPILER
+              PACKAGER</span
+            >
+            <button
+              class="text-white/40 hover:text-rose-500 transition"
+              onclick="ui.closeModal('export-modal')"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <div class="p-8 flex gap-6 bg-[var(--bg-sidebar)]">
+            <button
+              class="flex-1 p-6 rounded-xl border border-white/5 hover:border-sky-500 bg-[var(--bg-panel)] hover:bg-sky-500/10 transition text-center group relative overflow-hidden"
+              onclick="engine.exportZIP()"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-b from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"
+              ></div>
+              <i
+                class="fas fa-file-archive text-4xl text-white/30 group-hover:text-sky-400 mb-4 block transition z-10 relative"
+              ></i>
+              <div class="font-bold text-sm text-white z-10 relative">
+                Production Bundle ZIP
+              </div>
+              <div class="text-xs text-white/40 mt-2 z-10 relative">
+                Separated index.html, style.css, script.js
+              </div>
+            </button>
+            <button
+              class="flex-1 p-6 rounded-xl border border-white/5 hover:border-indigo-500 bg-[var(--bg-panel)] hover:bg-indigo-500/10 transition text-center group relative overflow-hidden"
+              onclick="engine.exportSingleHTML()"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"
+              ></div>
+              <i
+                class="fas fa-file-code text-4xl text-white/30 group-hover:text-indigo-400 mb-4 block transition z-10 relative"
+              ></i>
+              <div class="font-bold text-sm text-white z-10 relative">
+                Monolithic HTML Wrapper
+              </div>
+              <div class="text-xs text-white/40 mt-2 z-10 relative">
+                Zero-dependency single-file deployment
+              </div>
+            </button>
+            <button
+              class="flex-1 p-6 rounded-xl border border-white/5 hover:border-emerald-500 bg-[var(--bg-panel)] hover:bg-emerald-500/10 transition text-center group relative overflow-hidden"
+              onclick="engine.exportViewCode()"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"
+              ></div>
+              <i
+                class="fas fa-laptop-code text-4xl text-white/30 group-hover:text-emerald-400 mb-4 block transition z-10 relative"
+              ></i>
+              <div class="font-bold text-sm text-white z-10 relative">
+                Copy Source Buffer
+              </div>
+              <div class="text-xs text-white/40 mt-2 z-10 relative">
+                Render raw output onto clipboard
+              </div>
+            </button>
+          </div>
+          <div
+            id="code-output-wrap"
+            class="flex-1 hidden flex-col overflow-hidden border-t border-white/5 bg-[var(--bg-master)]"
+          >
+            <div
+              class="p-2 bg-[var(--bg-panel)] border-b border-white/5 flex justify-end"
+            >
+              <button
+                class="text-xs font-mono text-sky-400 hover:text-white transition px-3 py-1 bg-sky-500/10 rounded border border-sky-500/20"
+                onclick="engine.copyExportToClipboard()"
+              >
+                <i class="fas fa-copy mr-1"></i> Copy Buffer
+              </button>
+            </div>
+            <textarea
+              id="code-output"
+              class="flex-1 w-full bg-transparent text-sky-200 p-6 font-mono text-xs resize-none outline-none custom-scroll"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN ENGINE IMPLEMENTATION -->
+    <script>
+      /* =========================================================================
+       B2. OMNI-BUILDER PLATFORM CORE ENGINE
+       Single-File, Reactive State Machine with Deep-Merged Subsystems
+       ========================================================================= */
+
+      const SEC_TEMPLATES = {
+        navbar: {
+          brand: "OmniSystem",
+          logo: "",
+          items: [
+            { t: "Features", l: "#feat_0" },
+            { t: "Architecture", l: "#hyb_0" },
+            { t: "Pricing", l: "#ecom_0" },
+          ],
+          btn: "Get Access",
+          btn_act: "scroll:form_0",
+          spacing: {
+            pt: 20,
+            pb: 20,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-bg)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-down", dur: 800, del: 0, hover: "none" },
+        },
+        hero: {
+          title: "Next-Gen Omni-Builder Platform.",
+          sub: "Absolute granular control over your digital enterprise ecosystem. Zero limits.",
+          btn1: "Deploy Node",
+          btn1_act: "scroll:feat_0",
+          btn2: "View Documentation",
+          btn2_act: "url:https://github.com",
+          img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80",
+          variant: "split",
+          plx: false,
+          plx_overlay: "0.5",
+          spacing: {
+            pt: 120,
+            pb: 120,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-bg)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-up", dur: 800, del: 0, hover: "none" },
+        },
+        features: {
+          title: "Core Architecture",
+          sub: "Modular edge blocks engineered for visual performance.",
+          variant: "grid3",
+          items: [
+            {
+              t: "Granular Control",
+              d: "Modify spacing, margins, and paddings down to the absolute pixel level.",
+              i: "fas fa-sliders-h",
+            },
+            {
+              t: "Dynamic Archetypes",
+              d: "Switch between Blog, SaaS, E-Commerce, and Chat modes seamlessly.",
+              i: "fas fa-exchange-alt",
+            },
+            {
+              t: "Premium Themes",
+              d: "Deploy Matrix Neon, Nordic Frost, or Luxury Gold palettes instantly.",
+              i: "fas fa-paint-brush",
+            },
+          ],
+          spacing: {
+            pt: 100,
+            pb: 100,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-surface)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-up", dur: 800, del: 0, hover: "scale-lift" },
+        },
+        hybrid: {
+          title: "Hybrid Layout Matrix",
+          sub: "Inject absolute custom structures into the node.",
+          grid: "grid-cols-1 md:grid-cols-2",
+          elements: [
+            {
+              type: "text",
+              content:
+                "<h3 class='text-3xl font-extrabold mb-4 text-[var(--b2-primary)]'>Responsive Grid Blocks</h3><p class='text-lg opacity-80 leading-relaxed'>Configure columns layout. Add text, video, icons, and blockquotes dynamically.</p>",
+              col_span: "",
+              pt: 0,
+              pb: 0,
+              pl: 0,
+              pr: 0,
+            },
+            {
+              type: "icon_block",
+              icon: "fas fa-bolt",
+              title: "Reactive Event Loops",
+              desc: "Double-click text directly in the preview to edit properties globally.",
+              col_span: "",
+              pt: 20,
+              pb: 20,
+              pl: 20,
+              pr: 20,
+            },
+          ],
+          spacing: {
+            pt: 80,
+            pb: 80,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-bg)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-in", dur: 800, del: 0, hover: "none" },
+        },
+        blog: {
+          title: "Latest Transmissions",
+          sub: "Insights from the development core.",
+          posts: [
+            {
+              title: "Building Resilient Architectures",
+              excerpt: "How to deploy 100% zero-dependency frameworks.",
+              author: "Behrad B.",
+              date: "Oct 22, 2025",
+              readTime: "5 min",
+              img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+            },
+            {
+              title: "The Future of Web Compilation",
+              excerpt: "Client-side generation techniques for absolute speed.",
+              author: "System Admin",
+              date: "Nov 06, 2025",
+              readTime: "8 min",
+              img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+            },
+          ],
+          spacing: {
+            pt: 100,
+            pb: 100,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-bg)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-up", dur: 800, del: 0, hover: "3d-tilt" },
+        },
+        ecommerce: {
+          title: "Licensing Allocations",
+          sub: "Acquire computational nodes.",
+          items: [
+            {
+              id: "lic1",
+              t: "Standard Node",
+              d: "Lightweight single-page execution.",
+              p: "49",
+              img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80",
+            },
+            {
+              id: "lic2",
+              t: "Quantum Cluster",
+              d: "Accelerated visual compute engines.",
+              p: "149",
+              img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+            },
+          ],
+          spacing: {
+            pt: 100,
+            pb: 100,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-surface)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "zoom-in", dur: 800, del: 0, hover: "float-glow" },
+        },
+        form: {
+          title: "Secure Terminal",
+          sub: "Initialize connection parameters.",
+          btn: "Transmit Signal",
+          inputs: [
+            {
+              type: "text",
+              name: "name",
+              placeholder: "Identity Designation",
+              req: true,
+            },
+            {
+              type: "email",
+              name: "email",
+              placeholder: "Communication Node (Email)",
+              req: true,
+            },
+            {
+              type: "textarea",
+              name: "message",
+              placeholder: "Payload content...",
+              req: true,
+            },
+          ],
+          spacing: {
+            pt: 100,
+            pb: 100,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "var(--b2-bg)",
+            txt_col: "var(--b2-text-main)",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-up", dur: 800, del: 0, hover: "none" },
+        },
+        footer: {
+          text: "© 2026 OmniSystem Corporation. All rights reserved.",
+          spacing: {
+            pt: 60,
+            pb: 60,
+            pl: 24,
+            pr: 24,
+            mt: 0,
+            mb: 0,
+            ml: 0,
+            mr: 0,
+          },
+          style: {
+            bg_col: "#020408",
+            txt_col: "#94a3b8",
+            bg_gradient: "",
+            bg_angle: "135",
+            rad_tl: 0,
+            rad_tr: 0,
+            rad_bl: 0,
+            rad_br: 0,
+            glow_col: "",
+            glow_size: 0,
+          },
+          motion: { anim: "fade-in", dur: 800, del: 0, hover: "none" },
+        },
+      };
+
+      const PRESETS = {
+        matrix: {
+          primary: "#f43f5e",
+          bg: "#020408",
+          surface: "#090f1d",
+          text_main: "#f8fafc",
+          text_muted: "#94a3b8",
+          glow: "rgba(6,182,212,0.4)",
+        },
+        nordic: {
+          primary: "#60a5fa",
+          bg: "#111827",
+          surface: "#1f2937",
+          text_main: "#f3f4f6",
+          text_muted: "#9ca3af",
+          glow: "rgba(59,130,246,0.4)",
+        },
+        royal: {
+          primary: "#fbbf24",
+          bg: "#0a0a0c",
+          surface: "#17171a",
+          text_main: "#fdf6e3",
+          text_muted: "#a1a1aa",
+          glow: "rgba(217,119,6,0.4)",
+        },
+        tokyo: {
+          primary: "#84cc16",
+          bg: "#1e1b4b",
+          surface: "#312e81",
+          text_main: "#e0e7ff",
+          text_muted: "#a5b4fc",
+          glow: "rgba(217,249,157,0.4)",
+        },
+      };
+
+      const DEFAULT_STATE = {
+        meta: {
+          title: "Omni-Builder Enterprise Matrix",
+          desc: "Granular control sandbox environment.",
+          keywords: "omni-builder, enterprise, saas",
+          og_title: "OmniSystem Active",
+          og_desc: "Visual edge code compiler engine.",
+          og_img:
+            "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&h=630&q=80",
+          favicon: "",
+          lang: "en",
+          dir: "ltr",
+          robots: "index, follow",
+          ga_id: "",
+          schema_type: "SoftwareApplication",
+          archetype: "saas",
+        },
+        theme: {
+          headerFont: "Space Grotesk",
+          bodyFont: "Inter",
+          rad: "12px",
+          colors: {
+            primary: "#0ea5e9",
+            secondary: "#8b5cf6",
+            bg: "#ffffff",
+            surface: "#f8fafc",
+            border: "#e2e8f0",
+            text_main: "#0f172a",
+            text_muted: "#64748b",
+            glow: "rgba(14,165,233,0.3)",
+          },
+          glass: {
+            blur: "16px",
+            saturation: "150%",
+            shadow_y: "20px",
+            shadow_blur: "40px",
+            shadow_color: "rgba(0,0,0,0.08)",
+          },
+        },
+        custom: {
+          css: "/* Custom CSS Global overrides */\n",
+          js: "/* JS Hooks */\n",
+        },
+        ecommerce: {
+          currency: "$",
+          gateway: "whatsapp",
+          whatsapp_num: "1234567890",
+          telegram_token: "",
+          telegram_chat_id: "",
+          webhook_url: "",
+        },
+        leads: [],
+        sections: [
+          {
+            id: "nav_0",
+            type: "navbar",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.navbar)),
+          },
+          {
+            id: "hero_0",
+            type: "hero",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.hero)),
+          },
+          {
+            id: "feat_0",
+            type: "features",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.features)),
+          },
+          {
+            id: "hyb_0",
+            type: "hybrid",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.hybrid)),
+          },
+          {
+            id: "form_0",
+            type: "form",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.form)),
+          },
+          {
+            id: "ftr_0",
+            type: "footer",
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES.footer)),
+          },
+        ],
+      };
+
+      const engine = {
+        state: null,
+        history: [],
+        redoStack: [],
+        uploadTarget: null,
+
+        init() {
+          try {
+            const stored = localStorage.getItem("b2_omni_v4_0");
+            if (stored) {
+              this.state = JSON.parse(stored);
+              if (!this.state.theme.headerFont)
+                throw new Error("Outdated schema");
+            } else {
+              this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+              this.applyPreset("matrix");
+            }
+          } catch (e) {
+            console.warn("Schema transition:", e);
+            this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            this.applyPreset("matrix");
+          }
+
+          this.saveHistory();
+          setTimeout(() => {
+            const boot = document.getElementById("boot-loader");
+            if (boot) {
+              boot.style.opacity = "0";
+              setTimeout(() => boot.remove(), 500);
+            }
+            this.render();
+            ui.renderPanel("layout");
+          }, 800);
+
+          // Iframe PostMessage Bridge
+          window.addEventListener("message", (e) => {
+            if (!e.data || typeof e.data !== "object") return;
+            if (e.data.type === "updateText") {
+              this.update(e.data.path, e.data.val, true);
+            } else if (e.data.type === "triggerImageSelection") {
+              this.uploadTarget = e.data.path;
+              document.getElementById("upload").click();
+            } else if (e.data.type === "leadSubmit") {
+              this.addLead(e.data.data);
+            } else if (e.data.type === "orderAction") {
+              this.handleCheckout(e.data.orderText);
+            }
+          });
+
+          // Canvas Image Auto-Compression (500KB Guardrail)
+          document
+            .getElementById("upload")
+            .addEventListener("change", async (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              if (file.size > 500000 && file.type.startsWith("image/")) {
+                ui.showToast("Compressing Asset to WebP...");
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  const img = new Image();
+                  img.src = ev.target.result;
+                  img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    let w = img.width,
+                      h = img.height;
+                    const maxW = 1600;
+                    if (w > maxW) {
+                      h = Math.round((h * maxW) / w);
+                      w = maxW;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, w, h);
+                    let quality = 0.8;
+                    let webp = canvas.toDataURL("image/webp", quality);
+                    while (webp.length > 550000 && quality > 0.1) {
+                      quality -= 0.15;
+                      webp = canvas.toDataURL("image/webp", quality);
+                    }
+                    this.update(this.uploadTarget, webp);
+                    ui.showToast("WebP asset injected.");
+                  };
+                };
+                reader.readAsDataURL(file);
+              } else {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  try {
+                    this.update(this.uploadTarget, ev.target.result);
+                    ui.showToast("Asset updated.");
+                  } catch (err) {
+                    ui.showToast("Memory Error! File too large.", true);
+                  }
+                };
+                reader.readAsDataURL(file);
+              }
+              e.target.value = "";
+            });
+        },
+
+        saveHistory() {
+          if (this.history.length >= 40) this.history.shift(); // 40 steps max
+          this.history.push(JSON.stringify(this.state));
+          this.redoStack = [];
+          this.saveLocal();
+        },
+        saveLocal() {
+          try {
+            localStorage.setItem("b2_omni_v4_0", JSON.stringify(this.state));
+          } catch (e) {
+            ui.showToast("Storage quota exceeded!", true);
+          }
+        },
+        undo() {
+          if (this.history.length > 1) {
+            this.redoStack.push(this.history.pop());
+            this.state = JSON.parse(this.history[this.history.length - 1]);
+            this.render();
+            ui.refresh();
+            ui.showToast("Undone.");
+          }
+        },
+        redo() {
+          if (this.redoStack.length > 0) {
+            const state = this.redoStack.pop();
+            this.history.push(state);
+            this.state = JSON.parse(state);
+            this.render();
+            ui.refresh();
+            ui.showToast("Redone.");
+          }
+        },
+
+        update(path, val, skipHistory = false) {
+          if (!skipHistory) this.saveHistory();
+          let obj = this.state;
+          const parts = path.split(".");
+          for (let i = 0; i < parts.length - 1; i++) {
+            let p = parts[i];
+            if (p.includes("[")) {
+              const [k, idx] = p.split("[");
+              obj = obj[k][parseInt(idx.replace("]", ""))];
+            } else {
+              obj = obj[p];
+            }
+          }
+          const last = parts[parts.length - 1];
+          if (last.includes("[")) {
+            const [k, idx] = last.split("[");
+            obj[k][parseInt(idx.replace("]", ""))] = val;
+          } else {
+            obj[last] = val;
+          }
+          this.render();
+          this.saveLocal();
+          if (!skipHistory) ui.refresh();
+        },
+
+        applyPreset(presetId) {
+          const p = PRESETS[presetId];
+          this.state.theme.colors.primary = p.primary;
+          this.state.theme.colors.bg = p.bg;
+          this.state.theme.colors.surface = p.surface;
+          this.state.theme.colors.text_main = p.text_main;
+          this.state.theme.colors.text_muted = p.text_muted;
+          this.state.theme.colors.glow = p.glow;
+
+          this.state.sections.forEach((sec) => {
+            if (
+              sec.type === "hero" ||
+              sec.type === "navbar" ||
+              sec.type === "hybrid" ||
+              sec.type === "form" ||
+              sec.type === "blog"
+            )
+              sec.d.style.bg_col = "var(--b2-bg)";
+            if (sec.type === "features" || sec.type === "ecommerce")
+              sec.d.style.bg_col = "var(--b2-surface)";
+            if (sec.type === "footer") sec.d.style.bg_col = p.surface;
+          });
+          this.update("theme.colors", this.state.theme.colors);
+        },
+
+        uuid() {
+          return (
+            Date.now().toString(36) + Math.random().toString(36).substr(2, 4)
+          );
+        },
+        addSection(type) {
+          this.saveHistory();
+          this.state.sections.push({
+            id: type + "_" + this.uuid(),
+            type,
+            enabled: true,
+            d: JSON.parse(JSON.stringify(SEC_TEMPLATES[type])),
+          });
+          this.render();
+          ui.renderPanel("layout");
+        },
+        duplicateSection(idx) {
+          this.saveHistory();
+          const c = JSON.parse(JSON.stringify(this.state.sections[idx]));
+          c.id = c.type + "_clone_" + this.uuid();
+          this.state.sections.splice(idx + 1, 0, c);
+          this.render();
+          ui.renderPanel("layout");
+        },
+        moveSection(idx, dir) {
+          if (idx + dir < 0 || idx + dir >= this.state.sections.length) return;
+          this.saveHistory();
+          const t = this.state.sections[idx];
+          this.state.sections[idx] = this.state.sections[idx + dir];
+          this.state.sections[idx + dir] = t;
+          this.render();
+          ui.renderPanel("layout");
+        },
+        reset() {
+          if (confirm("INITIATE SYSTEM PURGE?")) {
+            localStorage.removeItem("b2_omni_v4_0");
+            location.reload();
+          }
+        },
+        saveProject() {
+          saveAs(
+            new Blob([JSON.stringify(this.state, null, 2)], {
+              type: "application/json",
+            }),
+            "OmniBuilder_State.json",
+          );
+          ui.showToast("Project JSON exported.");
+        },
+
+        addLead(data) {
+          data.date = new Date().toISOString();
+          this.state.leads.unshift(data);
+          this.saveLocal();
+          ui.showToast("Telemetry captured.");
+          if (ui.activeTab === "leads") ui.renderPanel("leads");
+        },
+        handleCheckout(text) {
+          ui.showToast("Transaction simulated.");
+          this.addLead({
+            name: "Transaction Sim",
+            email: "sys@omni-sandbox",
+            message: text,
+          });
+        },
+        downloadLeadsCSV() {
+          if (!this.state.leads.length)
+            return ui.showToast("Telemetry empty.", true);
+          const headers = Object.keys(this.state.leads[0]);
+          const csv = [
+            headers.join(","),
+            ...this.state.leads.map((l) =>
+              headers
+                .map((h) => `"${(l[h] || "").toString().replace(/"/g, '""')}"`)
+                .join(","),
+            ),
+          ].join("\n");
+          saveAs(
+            new Blob([csv], { type: "text/csv;charset=utf-8" }),
+            "Telemetry_Logs.csv",
+          );
+        },
+
+        // --- PRODUCTION WEB COMPILER ---
+        genHTML(mode = "preview") {
+          const s = this.state;
+          const t = s.theme;
+          const c = t.colors;
+          const g = t.glass;
+          const isExport = mode !== "preview";
+          const isRTL = s.meta.dir === "rtl";
+          const arch = s.meta.archetype;
+          const isCommerce = arch === "commerce";
+
+          let schema = {
+            "@context": "https://schema.org",
+            "@type": s.meta.schema_type,
+            name: s.meta.title,
+            description: s.meta.desc,
+            url: window.location.href,
+          };
+          if (s.meta.og_img) schema["image"] = s.meta.og_img;
+
+          let styles = `
+          :root {
+            --b2-primary: ${c.primary}; --b2-secondary: ${c.secondary};
+            --b2-bg: ${c.bg}; --b2-surface: ${c.surface}; --b2-border: ${c.border};
+            --b2-text-main: ${c.text_main}; --b2-text-muted: ${c.text_muted};
+            --b2-glow: ${c.glow}; --b2-rad: ${t.rad};
+            --b2-header-font: '${t.headerFont.replace(/\+/g, " ")}', sans-serif;
+            --b2-body-font: '${t.bodyFont.replace(/\+/g, " ")}', sans-serif;
+            --b2-glass-b: blur(${g.blur}); --b2-glass-s: saturate(${g.saturation});
+            --b2-shadow: 0 ${g.shadow_y} ${g.shadow_blur} ${g.shadow_color};
+          }
+          html { scroll-behavior: smooth; font-family: var(--b2-body-font); background: var(--b2-bg); color: var(--b2-text-main); direction: ${s.meta.dir}; }
+          body { overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; margin: 0; }
+          h1, h2, h3, h4, h5, h6, .font-heading { font-family: var(--b2-header-font); color: inherit; line-height: 1.2; font-weight: 800; }
+          p { line-height: 1.7; }
+          
+          .hover-scale-lift { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); } .hover-scale-lift:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 30px rgba(0,0,0,0.2); }
+          .hover-3d-tilt { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); perspective: 1000px; } .hover-3d-tilt:hover { transform: rotateX(4deg) rotateY(-4deg) translateY(-5px); box-shadow: 0 25px 35px rgba(0,0,0,0.2); }
+          .hover-float-glow { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); } .hover-float-glow:hover { transform: translateY(-6px); box-shadow: 0 0 25px var(--b2-primary); border-color: var(--b2-primary); }
+          .hover-border-draw { position: relative; transition: all 0.3s ease; } .hover-border-draw::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--b2-primary); border-radius: inherit; opacity: 0; transform: scale(0.95); transition: all 0.3s ease; } .hover-border-draw:hover::after { opacity: 1; transform: scale(1); }
+          .hover-matte { transition: all 0.3s ease; opacity: 0.8; } .hover-matte:hover { opacity: 1; filter: brightness(1.2); }
+
+          .b2-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.85rem 2rem; border-radius: var(--b2-rad); font-weight: 700; font-family: var(--b2-header-font); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; text-decoration: none; border: 1px solid transparent; letter-spacing: 0.02em; }
+          .btn-p { background: var(--b2-primary); color: #fff; box-shadow: 0 4px 20px var(--b2-glow); }
+          .btn-p:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--b2-glow); filter: brightness(1.1); }
+          .btn-s { background: transparent; border-color: currentColor; color: inherit; }
+          .btn-s:hover { background: var(--b2-text-main); color: var(--b2-bg); }
+
+          .b2-glass { background: var(--b2-surface); backdrop-filter: var(--b2-glass-b) var(--b2-glass-s); -webkit-backdrop-filter: var(--b2-glass-b) var(--b2-glass-s); box-shadow: var(--b2-shadow); border: 1px solid var(--b2-border); }
+
+          /* Chat Widget Styles */
+          #b2-chat-widget { position: fixed; bottom: 30px; ${isRTL ? "left" : "right"}: 30px; z-index: 99990; font-family: var(--b2-body-font); }
+          .chat-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--b2-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 10px 30px var(--b2-glow); transition: 0.3s; }
+          .chat-btn:hover { transform: scale(1.1); }
+          .chat-window { position: absolute; bottom: 80px; ${isRTL ? "left" : "right"}: 0; width: 350px; background: var(--b2-surface); border: 1px solid var(--b2-border); border-radius: 16px; box-shadow: var(--b2-shadow); overflow: hidden; display: none; flex-direction: column; transform-origin: bottom ${isRTL ? "left" : "right"}; animation: popUp 0.3s cubic-bezier(0.16,1,0.3,1); }
+          @keyframes popUp { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+          .chat-window.open { display: flex; }
+          .chat-body { height: 300px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+          .chat-msg { padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; max-width: 85%; line-height: 1.5; }
+          .chat-bot { background: rgba(0,0,0,0.2); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
+          .chat-user { background: var(--b2-primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+          .chat-input { display: flex; border-top: 1px solid var(--b2-border); }
+          .chat-input input { flex: 1; background: transparent; border: none; padding: 15px; color: var(--b2-text-main); outline: none; }
+          .chat-input button { padding: 15px; background: transparent; color: var(--b2-primary); border: none; cursor: pointer; transition: 0.2s; }
+          .chat-input button:hover { color: white; background: var(--b2-primary); }
+
+          /* Cart Styles */
+          #b2-cart { position: fixed; top: 0; ${isRTL ? "left" : "right"}: -450px; width: 420px; max-width: 100vw; height: 100vh; background: var(--b2-surface); border-${isRTL ? "right" : "left"}: 1px solid var(--b2-border); box-shadow: var(--b2-shadow); z-index: 99999; transition: 0.4s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column; color: var(--b2-text-main); }
+          #b2-cart.open { ${isRTL ? "left" : "right"}: 0; }
+          .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 99998; opacity: 0; pointer-events: none; transition: 0.3s; }
+          .cart-overlay.open { opacity: 1; pointer-events: auto; }
+          .cart-item { display: flex; gap: 1rem; align-items: center; padding: 1rem; border-bottom: 1px solid var(--b2-border); }
+
+          ${s.custom.css}
+          `;
+
+          if (!isExport) {
+            styles += `
+            [contenteditable]:focus { outline: 2px dashed var(--b2-primary) !important; background: rgba(14, 165, 233, 0.15) !important; border-radius: 4px; }
+            .b2-section { position: relative; }
+            .b2-sec-hover { position: absolute; top: 10px; ${isRTL ? "left" : "right"}: 10px; background: #0b0f19; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 4px; display: none; z-index: 50; gap: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+            .b2-section:hover::after { content: ''; position: absolute; inset: 0; border: 2px dashed rgba(14, 165, 233, 0.45); pointer-events: none; z-index: 49; }
+            .b2-section:hover > .b2-sec-hover { display: flex; }
+            .b2-sec-hover button { background: transparent; color: white; border: none; padding: 6px 10px; cursor: pointer; border-radius: 4px; font-size: 11px; transition: 0.2s; }
+            .b2-sec-hover button:hover { background: var(--b2-primary); }
+            img, video, .clickable-image { cursor: pointer; transition: outline 0.2s ease; }
+            img:hover, video:hover, .clickable-image:hover { outline: 3px dashed var(--b2-primary); outline-offset: -3px; }
+            `;
+          }
+
+          let doc = `<!DOCTYPE html>\n<html lang="${s.meta.lang}" dir="${s.meta.dir}">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n`;
+          doc += `<title>${s.meta.title}</title>\n<meta name="description" content="${s.meta.desc}">\n<meta name="keywords" content="${s.meta.keywords}">\n<meta name="robots" content="${s.meta.robots}">\n`;
+          doc += `<meta property="og:title" content="${s.meta.og_title || s.meta.title}">\n<meta property="og:description" content="${s.meta.og_desc || s.meta.desc}">\n`;
+          if (s.meta.og_img)
+            doc += `<meta property="og:image" content="${s.meta.og_img}">\n`;
+          if (s.meta.favicon)
+            doc += `<link rel="icon" href="${s.meta.favicon}">\n`;
+
+          doc += `<script src="https://cdn.tailwindcss.com"><\/script>\n<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n`;
+          const fontQuery = [t.headerFont, t.bodyFont]
+            .map(
+              (f) =>
+                `family=${f.replace(/ /g, "+")}:wght@300;400;500;600;700;800`,
+            )
+            .join("&");
+          doc += `<link href="https://fonts.googleapis.com/css2?${fontQuery}&display=swap" rel="stylesheet">\n`;
+          doc += `<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"><\/script>\n<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">\n`;
+
+          doc += `<script type="application/ld+json">\n${JSON.stringify(schema, null, 2)}\n<\/script>\n`;
+          if (s.meta.ga_id && isExport) {
+            doc += `<script async src="https://www.googletagmanager.com/gtag/js?id=${s.meta.ga_id}"><\/script>\n<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${s.meta.ga_id}');<\/script>\n`;
+          }
+
+          doc += `<style id="b2-theme-styles">${styles}</style>\n</head>\n<body>\n`;
+
+          if (isCommerce) {
+            doc += `<div class="cart-overlay" id="cartOverlay"></div>
+                <div id="b2-cart">
+                  <div class="flex items-center justify-between p-6 border-b" style="border-color: var(--b2-border)">
+                    <h2 class="text-2xl font-heading">Order Summary</h2>
+                    <button class="opacity-50 hover:opacity-100 transition" onclick="toggleCart()"><i class="fas fa-times text-xl"></i></button>
+                  </div>
+                  <div id="cart-items" class="flex-1 overflow-y-auto custom-scroll"></div>
+                  <div class="p-6 border-t bg-black/5" style="border-color: var(--b2-border)">
+                    <div class="flex justify-between font-heading text-2xl mb-6"><span>Total:</span><span id="cart-total" style="color: var(--b2-primary)">${s.ecommerce.currency}0.00</span></div>
+                    <button class="b2-btn btn-p w-full text-lg shadow-lg" onclick="processCheckout()">Secure Transmission <i class="fas fa-lock ml-2 text-sm"></i></button>
+                  </div>
+                </div>`;
+          }
+
+          if (arch === "chat") {
+            doc += `<div id="b2-chat-widget">
+              <div class="chat-window" id="chatWin">
+                <div class="p-4 bg-[var(--b2-primary)] text-white flex justify-between items-center">
+                  <span class="font-heading font-bold"><i class="fas fa-robot mr-2"></i> Omni AI Agent</span>
+                  <button onclick="toggleChat()" class="hover:opacity-70"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="chat-body custom-scroll" id="chatBody">
+                  <div class="chat-msg chat-bot">Hello! I am the Omni AI instance. How can I assist you with this architecture today?</div>
+                </div>
+                <form class="chat-input" onsubmit="event.preventDefault(); sendChatMsg();">
+                  <input type="text" id="chatInput" placeholder="Type a message..." required autocomplete="off">
+                  <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+              </div>
+              <button class="chat-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i></button>
+            </div>`;
+          }
+
+          doc += `<div id="leadModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] hidden items-center justify-center p-4">
+              <div class="b2-glass max-w-lg w-full rounded-[var(--b2-rad)] p-8 relative">
+                <button class="absolute top-4 right-4 opacity-50 hover:opacity-100 text-lg" onclick="toggleLeadModal()"><i class="fas fa-times"></i></button>
+                <h3 class="text-2xl font-heading mb-2">Initialize Connection</h3>
+                <p class="opacity-70 text-sm mb-6">Complete the parameters below to connect.</p>
+                <form class="b2-form flex flex-col gap-4">
+                  <input type="text" name="name" placeholder="Entity Designation" required class="w-full p-3 rounded bg-black/10 border border-current/20 text-inherit">
+                  <input type="email" name="email" placeholder="E-Mail Node" required class="w-full p-3 rounded bg-black/10 border border-current/20 text-inherit">
+                  <textarea name="message" placeholder="Payload details..." required class="w-full p-3 rounded bg-black/10 border border-current/20 text-inherit min-h-[100px]"></textarea>
+                  <button type="submit" class="b2-btn btn-p w-full">Transmit Signals</button>
+                </form>
+              </div>
+            </div>`;
+
+          doc += `<script id="b2-app-logic">
+          // Global Utilities
+          function toggleLeadModal() { const m = document.getElementById('leadModal'); if (m) m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+          
+          // Chat Arch Logic
+          function toggleChat() { const cw = document.getElementById('chatWin'); if (cw) cw.classList.toggle('open'); }
+          function sendChatMsg() {
+            const inp = document.getElementById('chatInput'); const text = inp.value; if(!text) return;
+            const cb = document.getElementById('chatBody');
+            cb.innerHTML += '<div class="chat-msg chat-user">' + text.replace(/</g, "&lt;") + '</div>'; inp.value = ''; cb.scrollTop = cb.scrollHeight;
+            setTimeout(() => { cb.innerHTML += '<div class="chat-msg chat-bot">I have received your payload: "' + text.substring(0,20) + '...". Our systems will process this shortly.</div>'; cb.scrollTop = cb.scrollHeight; }, 1000);
+          }
+
+          // E-Commerce Logic
+          let cart = JSON.parse(sessionStorage.getItem('b2_cart') || '[]'); const currency = '${s.ecommerce.currency}';
+          function toggleCart() { const c = document.getElementById('b2-cart'); const o = document.getElementById('cartOverlay'); if (c && o) { c.classList.toggle('open'); o.classList.toggle('open'); renderCart(); } }
+          if (document.getElementById('cartOverlay')) document.getElementById('cartOverlay').addEventListener('click', toggleCart);
+          function addToCart(id, title, price, img) { const ex = cart.find(i => i.id === id); if (ex) ex.qty += 1; else cart.push({ id, title, price: parseFloat(price), img, qty: 1 }); sessionStorage.setItem('b2_cart', JSON.stringify(cart)); toggleCart(); }
+          function changeQty(idx, delta) { cart[idx].qty += delta; if (cart[idx].qty <= 0) cart.splice(idx, 1); sessionStorage.setItem('b2_cart', JSON.stringify(cart)); renderCart(); }
+          function renderCart() {
+            const el = document.getElementById('cart-items'); if (!el) return;
+            if (!cart.length) { el.innerHTML = '<div class="text-center mt-20 opacity-50"><i class="fas fa-shopping-basket text-5xl mb-4"></i><p>Basket empty</p></div>'; if (document.getElementById('cart-total')) document.getElementById('cart-total').innerText = currency + '0.00'; return; }
+            let total = 0;
+            el.innerHTML = cart.map((item, i) => { total += (item.price * item.qty); return '<div class="cart-item"><img src="' + item.img + '" class="w-16 h-16 object-cover rounded shadow"><div class="flex-1"><h4 class="font-bold text-sm">' + item.title + '</h4><p class="opacity-75 text-xs">' + currency + item.price.toFixed(2) + '</p><div class="flex items-center gap-3 bg-black/5 w-fit rounded px-2 py-0.5 mt-2"><button onclick="changeQty(' + i + ',-1)" class="opacity-70 hover:opacity-100 text-xs"><i class="fas fa-minus"></i></button><span class="text-xs font-bold">' + item.qty + '</span><button onclick="changeQty(' + i + ',1)" class="opacity-70 hover:opacity-100 text-xs"><i class="fas fa-plus"></i></button></div></div><button onclick="cart.splice(' + i + ',1); sessionStorage.setItem(\\'b2_cart\\', JSON.stringify(cart)); renderCart();" class="text-red-500 opacity-60 hover:opacity-100 text-sm p-1"><i class="fas fa-trash"></i></button></div>'; }).join('');
+            if (document.getElementById('cart-total')) document.getElementById('cart-total').innerText = currency + total.toFixed(2);
+          }
+          function processCheckout() {
+            if (!cart.length) return; let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const text = "System Order:\\n" + cart.map(i => " - " + i.title + " x" + i.qty + " (" + currency + (i.price * i.qty) + ")").join("\\n") + "\\nTotal: " + currency + total;
+            const gateway = '${s.ecommerce.gateway}';
+            ${
+              isExport
+                ? `
+              if (gateway === 'whatsapp') window.open('https://wa.me/${s.ecommerce.whatsapp_num}?text=' + encodeURIComponent(text), '_blank');
+              else if (gateway === 'telegram') fetch('https://api.telegram.org/bot${s.ecommerce.telegram_token}/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: '${s.ecommerce.telegram_chat_id}', text: text }) }).then(() => alert('Payload Transmitted!')).catch(() => alert('Failed payload.'));
+              else if (gateway === 'webhook') fetch('${s.ecommerce.webhook_url}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderPayload: text, cartItems: cart, totalPrice: total }) }).then(() => alert('Webhook Triggered!')).catch(() => alert('Webhook error.'));
+              else alert("Simulating:\\n\\n" + text);
+            `
+                : `window.parent.postMessage({ type: 'orderAction', orderText: text }, '*');`
+            }
+          }
+
+          function act(actionVal, element) {
+            if (!actionVal) return;
+            if (actionVal.startsWith('scroll:')) { const targetNode = document.getElementById(actionVal.split(':')[1]); if (targetNode) targetNode.scrollIntoView({ behavior: 'smooth' }); }
+            else if (actionVal.startsWith('url:')) { window.open(actionVal.substring(4), '_blank'); }
+            else if (actionVal === 'lead_modal') { toggleLeadModal(); }
+            else if (actionVal === 'cart') { toggleCart(); }
+            else if (actionVal.startsWith('js_hook:')) { try { const execute = new Function(actionVal.substring(8)); execute(); } catch (err) { console.error("JS Hook error:", err); } }
+          }
+
+          document.addEventListener('click', e => { const btn = e.target.closest('[data-act]'); if (btn) { e.preventDefault(); act(btn.dataset.act, btn); } });
+          document.addEventListener('submit', e => {
+            if (e.target.matches('.b2-form')) {
+              e.preventDefault(); const fd = new FormData(e.target); const data = Object.fromEntries(fd.entries());
+              ${isExport ? `alert("Signal intercepted."); e.target.innerHTML = '<div class="b2-glass p-6 text-center text-[var(--b2-primary)] font-bold rounded-[var(--b2-rad)]"><i class="fas fa-check-circle text-3xl mb-3 block"></i>Signal Transmitted</div>';` : `window.parent.postMessage({ type: 'leadSubmit', data: data }, '*'); e.target.innerHTML = '<div class="b2-glass p-6 text-center text-[var(--b2-primary)] font-bold rounded-[var(--b2-rad)]"><i class="fas fa-check-circle text-3xl mb-3 block"></i>Data Intercepted</div>';`}
+            }
+          });
+          <\/script>`;
+
+          if (!isExport) {
+            doc += `<script>
+            document.addEventListener('dblclick', e => {
+              if (e.target.dataset.path) {
+                e.target.contentEditable = true; e.target.focus();
+                e.target.onblur = function() { e.target.contentEditable = false; window.parent.postMessage({ type: 'updateText', path: e.target.dataset.path, val: e.target.innerText }, '*'); };
+              }
+            });
+            document.addEventListener('click', e => {
+              const img = e.target.closest('img');
+              if (img && img.dataset.path) window.parent.postMessage({ type: 'triggerImageSelection', path: img.dataset.path }, '*');
+            });
+            function sAction(act, idx) { window.parent.postMessage({ type: 'action', act, idx }, '*'); }
+            <\/script>`;
+          }
+
+          // RENDER ENGINE LOOP
+          s.sections.forEach((sec, idx) => {
+            if (!sec.enabled) return;
+            const d = sec.d;
+            const ed = (key) =>
+              !isExport ? `data-path="sections[${idx}].d.${key}"` : "";
+
+            // Spacing Engine
+            const sp = d.spacing;
+            const spStyle = `padding: ${sp.pt}px ${sp.pr}px ${sp.pb}px ${sp.pl}px; margin: ${sp.mt}px ${sp.mr}px ${sp.mb}px ${sp.ml}px;`;
+
+            // Style Engine
+            const st = d.style;
+            const radStyle = `border-radius: ${st.rad_tl}px ${st.rad_tr}px ${st.rad_br}px ${st.rad_bl}px;`;
+            const glowStyle =
+              st.glow_size > 0
+                ? `box-shadow: 0 0 ${st.glow_size}px ${st.glow_col};`
+                : "";
+            const bgRender = st.bg_gradient
+              ? `background: linear-gradient(${st.bg_angle}deg, ${st.bg_col}, ${st.bg_gradient});`
+              : `background-color: ${st.bg_col};`;
+            const plxStyle = d.plx
+              ? `background-attachment: fixed; background-size: cover; background-position: center; background-image: url('${d.img}');`
+              : "";
+
+            // Motion Engine
+            const mo = d.motion;
+            const aosAttr = mo.anim
+              ? `data-aos="${mo.anim}" data-aos-duration="${mo.dur}" data-aos-delay="${mo.del}"`
+              : "";
+            const hoverCls = mo.hover !== "none" ? `hover-${mo.hover}` : "";
+
+            const combinedStyles = `${bgRender} color: ${st.txt_col}; ${spStyle} ${radStyle} ${glowStyle} ${plxStyle} transition: all 0.3s ease;`;
+
+            doc += `<section id="${sec.type}_${idx}" class="b2-section ${hoverCls}" style="${combinedStyles}">`;
+
+            if (!isExport) {
+              doc += `<div class="b2-sec-hover font-sans text-white">
+                <button onclick="sAction('up', ${idx})" title="Shift Up"><i class="fas fa-arrow-up"></i></button>
+                <button onclick="sAction('down', ${idx})" title="Shift Down"><i class="fas fa-arrow-down"></i></button>
+                <button onclick="sAction('dup', ${idx})" title="Clone Node"><i class="fas fa-copy"></i></button>
+                <button onclick="sAction('delete', ${idx})" title="Purge Node" class="!text-red-400"><i class="fas fa-trash"></i></button>
+              </div>`;
+            }
+
+            // --- NAVBAR ---
+            if (sec.type === "navbar") {
+              doc += `<div class="max-w-7xl mx-auto flex items-center justify-between relative z-10" ${aosAttr}>
+                <div class="flex items-center gap-4">
+                  ${d.logo ? `<img src="${d.logo}" alt="Logo" class="h-10 w-auto object-contain" ${ed("logo")}>` : ""}
+                  <div class="font-heading text-2xl tracking-tighter" ${ed("brand")}>${d.brand}</div>
+                </div>
+                <nav class="hidden md:flex items-center gap-8 font-medium">
+                  ${d.items.map((it, i) => `<a href="${it.l}" class="hover:text-[var(--b2-primary)] transition" ${ed(`items[${i}].t`)}>${it.t}</a>`).join("")}
+                  ${d.btn ? `<button class="b2-btn btn-p shadow-md" data-act="${d.btn_act}" ${ed("btn")}>${d.btn}</button>` : ""}
+                  ${isCommerce ? `<button class="text-xl hover:text-[var(--b2-primary)] transition" data-act="cart"><i class="fas fa-shopping-bag"></i></button>` : `<button class="text-xl hover:text-[var(--b2-primary)] transition" data-act="lead_modal"><i class="fas fa-envelope"></i></button>`}
+                </nav>
+              </div>`;
+            }
+
+            // --- HERO ---
+            else if (sec.type === "hero") {
+              const alignCls =
+                d.variant === "center" ? "text-center mx-auto" : "";
+              const splitCls =
+                d.variant === "split"
+                  ? "grid md:grid-cols-2 gap-16 items-center"
+                  : "";
+              const overlay = d.plx
+                ? `<div class="absolute inset-0 bg-black/50 z-0" style="background-color: rgba(0,0,0,${d.plx_overlay})"></div>`
+                : "";
+              const media =
+                !d.plx && d.img
+                  ? `<img src="${d.img}" alt="Hero" class="w-full h-[550px] object-cover rounded-[var(--b2-rad)] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10" ${ed("img")}>`
+                  : "";
+
+              doc += `${overlay}<div class="max-w-7xl mx-auto relative z-10 ${splitCls}">
+                <div class="${alignCls}" ${aosAttr}>
+                  <h1 class="text-5xl md:text-7xl font-heading mb-6 tracking-tight leading-tight" ${ed("title")}>${d.title}</h1>
+                  <p class="text-xl opacity-80 mb-10 max-w-2xl leading-relaxed ${d.variant === "center" ? "mx-auto" : ""}" ${ed("sub")}>${d.sub}</p>
+                  <div class="flex flex-wrap gap-4 ${d.variant === "center" ? "justify-center" : ""}">
+                    ${d.btn1 ? `<button class="b2-btn btn-p text-lg" data-act="${d.btn1_act}" ${ed("btn1")}>${d.btn1}</button>` : ""}
+                    ${d.btn2 ? `<button class="b2-btn btn-s text-lg" data-act="${d.btn2_act}" ${ed("btn2")}>${d.btn2}</button>` : ""}
+                  </div>
+                </div>
+                ${d.variant === "split" ? `<div class="w-full hover-scale-lift">${media}</div>` : ""}
+              </div>`;
+            }
+
+            // --- FEATURES ---
+            else if (sec.type === "features") {
+              const gridCls =
+                d.variant === "grid2"
+                  ? "md:grid-cols-2"
+                  : d.variant === "grid4"
+                    ? "md:grid-cols-4"
+                    : "md:grid-cols-3";
+              doc += `<div class="max-w-7xl mx-auto relative z-10">
+                <div class="text-center mb-16" ${aosAttr}><h2 class="text-4xl md:text-5xl font-heading mb-4" ${ed("title")}>${d.title}</h2><p class="text-xl opacity-70 max-w-3xl mx-auto" ${ed("sub")}>${d.sub}</p></div>
+                <div class="grid gap-8 ${gridCls}">
+                  ${d.items
+                    .map(
+                      (it, i) => `
+                    <div class="b2-glass p-8 rounded-[var(--b2-rad)] transition duration-500 hover:-translate-y-2 group flex flex-col" ${aosAttr}>
+                      <div class="w-16 h-16 rounded-2xl bg-[var(--b2-primary)] text-white flex items-center justify-center text-3xl mb-8 shadow-[0_10px_20px_var(--b2-glow)] group-hover:scale-110 transition duration-300"><i class="${it.i}"></i></div>
+                      <h3 class="text-2xl font-heading mb-4" ${ed(`items[${i}].t`)}>${it.t}</h3>
+                      <p class="opacity-70 leading-relaxed text-lg mb-6 flex-1" ${ed(`items[${i}].d`)}>${it.d}</p>
+                      ${isCommerce ? `<button class="b2-btn btn-s w-full text-xs mt-auto" onclick="addToCart('feat_${i}','${it.t}','0','')">Acquire</button>` : `<button class="b2-btn btn-s w-full text-xs mt-auto" onclick="toggleLeadModal()">Learn More</button>`}
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+              </div>`;
+            }
+
+            // --- HYBRID GRID ---
+            else if (sec.type === "hybrid") {
+              doc += `<div class="max-w-7xl mx-auto relative z-10">
+                ${d.title ? `<div class="text-center mb-16" ${aosAttr}><h2 class="text-4xl md:text-5xl font-heading mb-4" ${ed("title")}>${d.title}</h2><p class="text-xl opacity-70" ${ed("sub")}>${d.sub}</p></div>` : ""}
+                <div class="grid gap-8 ${d.grid}" ${aosAttr}>`;
+              d.elements.forEach((el, i) => {
+                const innerSp = `padding: ${el.pt || 0}px ${el.pr || 0}px ${el.pb || 0}px ${el.pl || 0}px;`;
+                let inner = "";
+                if (el.type === "text")
+                  inner = `<div class="prose max-w-none text-inherit" style="${innerSp}" ${ed(`elements[${i}].content`)}>${el.content}</div>`;
+                else if (el.type === "video")
+                  inner = `<div style="${innerSp}"><video src="${el.src}" ${el.autoplay ? "autoplay loop muted" : ""} playsinline class="w-full rounded-[var(--b2-rad)] shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-white/10" controls></video></div>`;
+                else if (el.type === "blockquote")
+                  inner = `<blockquote class="border-l-4 border-[var(--b2-primary)] pl-6 italic text-xl opacity-90 my-4" style="${innerSp}" ${ed(`elements[${i}].content`)}>${el.content}</blockquote>`;
+                else if (el.type === "icon_block")
+                  inner = `<div class="b2-glass rounded-[var(--b2-rad)] group" style="${innerSp}"><i class="${el.icon} text-5xl mb-6 block text-[var(--b2-primary)] group-hover:scale-110 transition drop-shadow-md"></i><h4 class="text-2xl font-heading mb-3" ${ed(`elements[${i}].title`)}>${el.title}</h4><p class="opacity-80 text-lg leading-relaxed mb-6" ${ed(`elements[${i}].desc`)}>${el.desc}</p></div>`;
+                doc += `<div class="${el.col_span ? el.col_span : ""}">${inner}</div>`;
+              });
+              doc += `</div></div>`;
+            }
+
+            // --- BLOG ---
+            else if (sec.type === "blog") {
+              doc += `<div class="max-w-7xl mx-auto relative z-10">
+                <div class="flex justify-between items-end mb-16 border-b border-white/10 pb-6" ${aosAttr}>
+                  <div><h2 class="text-4xl md:text-5xl font-heading mb-2" ${ed("title")}>${d.title}</h2><p class="text-xl opacity-70" ${ed("sub")}>${d.sub}</p></div>
+                  <button class="hidden md:block b2-btn btn-s text-sm">View All Articles</button>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-10">
+                  ${d.posts
+                    .map(
+                      (p, i) => `
+                    <div class="group cursor-pointer" ${aosAttr}>
+                      <div class="relative overflow-hidden rounded-[var(--b2-rad)] h-80 mb-6 shadow-lg border border-white/5">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" ${ed(`posts[${i}].img`)}>
+                        <div class="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded text-xs font-bold border border-white/10 flex items-center gap-2"><i class="far fa-clock text-[var(--b2-primary)]"></i> <span ${ed(`posts[${i}].readTime`)}>${p.readTime}</span></div>
+                      </div>
+                      <div class="flex items-center gap-3 text-sm opacity-60 mb-3 font-mono uppercase tracking-widest"><span ${ed(`posts[${i}].date`)}>${p.date}</span> • <span ${ed(`posts[${i}].author`)}>${p.author}</span></div>
+                      <h3 class="text-3xl font-heading mb-3 group-hover:text-[var(--b2-primary)] transition" ${ed(`posts[${i}].title`)}>${p.title}</h3>
+                      <p class="text-lg opacity-70 leading-relaxed" ${ed(`posts[${i}].excerpt`)}>${p.excerpt}</p>
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+              </div>`;
+            }
+
+            // --- E-COMMERCE ---
+            else if (sec.type === "ecommerce") {
+              doc += `<div class="max-w-7xl mx-auto relative z-10">
+                <div class="text-center mb-16" ${aosAttr}><h2 class="text-4xl md:text-5xl font-heading mb-4" ${ed("title")}>${d.title}</h2><p class="text-xl opacity-70" ${ed("sub")}>${d.sub}</p></div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 justify-center">
+                  ${d.items
+                    .map(
+                      (it, i) => `
+                    <div class="b2-glass rounded-[var(--b2-rad)] overflow-hidden group flex flex-col" ${aosAttr}>
+                      <div class="h-72 overflow-hidden relative border-b border-white/10">
+                        <img src="${it.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" ${ed(`items[${i}].img`)}>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center backdrop-blur-sm">
+                           <button class="b2-btn btn-p transform translate-y-4 group-hover:translate-y-0 transition" onclick="addToCart('${it.id}','${it.t}','${it.p}','${it.img}')"><i class="fas fa-cart-plus mr-2"></i> Acquire</button>
+                        </div>
+                      </div>
+                      <div class="p-8 flex-1 flex flex-col">
+                        <h3 class="text-2xl font-heading mb-2" ${ed(`items[${i}].t`)}>${it.t}</h3>
+                        <p class="opacity-70 mb-6 flex-1 text-lg" ${ed(`items[${i}].d`)}>${it.d}</p>
+                        <div class="flex items-center justify-between mt-auto">
+                           <div class="text-4xl font-heading tracking-tight" style="color: var(--b2-primary)" ${ed(`items[${i}].p`)}>${s.ecommerce.currency}${it.p}</div>
+                           <button class="w-12 h-12 rounded-full bg-[var(--b2-primary)] text-white flex items-center justify-center shadow-[0_5px_15px_var(--b2-glow)] hover:scale-110 transition md:hidden" onclick="addToCart('${it.id}','${it.t}','${it.p}','${it.img}')"><i class="fas fa-plus"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+              </div>`;
+            }
+
+            // --- FORM ---
+            else if (sec.type === "form") {
+              doc += `<div class="max-w-3xl mx-auto relative z-10" ${aosAttr}>
+                <div class="text-center mb-12"><h2 class="text-4xl md:text-5xl font-heading mb-4" ${ed("title")}>${d.title}</h2><p class="text-xl opacity-70" ${ed("sub")}>${d.sub}</p></div>
+                <form class="b2-form b2-glass p-8 md:p-12 rounded-[var(--b2-rad)] flex flex-col gap-6">
+                  ${d.inputs.map((inp) => (inp.type === "textarea" ? `<textarea name="${inp.name}" placeholder="${inp.placeholder}" ${inp.req ? "required" : ""} class="w-full p-4 rounded-lg bg-black/10 border border-current/20 outline-none focus:border-[var(--b2-primary)] min-h-[160px] transition text-inherit shadow-inner font-body"></textarea>` : `<input type="${inp.type}" name="${inp.name}" placeholder="${inp.placeholder}" ${inp.req ? "required" : ""} class="w-full p-4 rounded-lg bg-black/10 border border-current/20 outline-none focus:border-[var(--b2-primary)] transition text-inherit shadow-inner font-body">`)).join("")}
+                  <button type="submit" class="b2-btn btn-p text-xl py-5 w-full mt-2 shadow-[0_10px_20px_var(--b2-glow)]" ${ed("btn")}>${d.btn}</button>
+                </form>
+              </div>`;
+            }
+
+            // --- FOOTER ---
+            else if (sec.type === "footer") {
+              doc += `<div class="max-w-7xl mx-auto text-center relative z-10" ${aosAttr}>
+                <div class="w-24 h-1 bg-[var(--b2-primary)] mx-auto mb-8 rounded-full opacity-50"></div>
+                <p class="opacity-60 text-lg tracking-wide" ${ed("text")}>${d.text}</p>
+              </div>`;
+            }
+
+            doc += `</section>\n`;
+          });
+
+          doc += `<script>AOS.init({duration: 800, once: true, offset: 100});<\/script>\n`;
+          if (s.custom.js) doc += `<script>${s.custom.js}<\/script>\n`;
+          doc += `</body>\n</html>`;
+          return doc;
+        },
+
+        exportSingleHTML() {
+          const raw = html_beautify(this.genHTML("export_single"), {
+            indent_size: 2,
+          });
+          saveAs(
+            new Blob([raw], { type: "text/html;charset=utf-8" }),
+            "index.html",
+          );
+          ui.closeModal("export-modal");
+          ui.showToast("Monolithic HTML Downloaded.");
+          confetti();
+        },
+        exportViewCode() {
+          document.getElementById("code-output").value = html_beautify(
+            this.genHTML("export_single"),
+            { indent_size: 2 },
+          );
+          document
+            .getElementById("code-output-wrap")
+            .classList.remove("hidden");
+          document.getElementById("code-output-wrap").classList.add("flex");
+        },
+        copyExportToClipboard() {
+          const t = document.createElement("textarea");
+          t.value = document.getElementById("code-output").value;
+          document.body.appendChild(t);
+          t.select();
+          document.execCommand("copy");
+          document.body.removeChild(t);
+          ui.showToast("Source copied to clipboard.");
+        },
+        exportZIP() {
+          ui.showToast("Compiling modular bundle...");
+          const zip = new JSZip();
+          const rawHTML = this.genHTML("export_zip");
+          const cssMatch = rawHTML.match(
+            /<style id="b2-theme-styles">([\s\S]*?)<\/style>/,
+          );
+          const jsMatch = rawHTML.match(
+            /<script id="b2-app-logic">([\s\S]*?)<\/script>/,
+          );
+          let cleanHTML = rawHTML;
+          if (cssMatch)
+            cleanHTML = cleanHTML.replace(
+              /<style id="b2-theme-styles">([\s\S]*?)<\/style>/,
+              '<link rel="stylesheet" href="style.css">',
+            );
+          if (jsMatch)
+            cleanHTML = cleanHTML.replace(
+              /<script id="b2-app-logic">([\s\S]*?)<\/script>/,
+              '<script src="script.js"><\/script>',
+            );
+
+          zip.file("index.html", html_beautify(cleanHTML, { indent_size: 2 }));
+          if (cssMatch) zip.file("style.css", cssMatch[1].trim());
+          if (jsMatch) zip.file("script.js", jsMatch[1].trim());
+          zip.file(
+            "README.md",
+            `# 🚀 Omni-Builder Deployment Matrix\n\n1. Upload all extracted files to any host (Netlify, Vercel, S3).\n2. Architecture is 100% dependency-free.\n3. Archetype: ${this.state.meta.archetype.toUpperCase()}\n4. Forms configured to route via: ${this.state.ecommerce.gateway}.`,
+          );
+
+          zip.generateAsync({ type: "blob" }).then((content) => {
+            saveAs(content, "Omni_Web_Bundle.zip");
+            ui.closeModal("export-modal");
+            ui.showToast("ZIP Bundle Downloaded.");
+            confetti();
+          });
+        },
+        render() {
+          const f = document.getElementById("preview");
+          if (f) f.srcdoc = this.genHTML("preview");
+        },
+      };
+
+      /* =========================================================================
+       UI CONTROLLER (IDE Workspace Shell)
+       ========================================================================= */
+
+      const ui = {
+        activeTab: "layout",
+        setTab(name, el) {
+          this.activeTab = name;
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));
+          el.classList.add("active");
+          this.renderPanel(name);
+        },
+        refresh() {
+          this.renderPanel(this.activeTab);
+        },
+        resize(mode) {
+          const w = document.getElementById("wrapper");
+          if (w) w.className = `device-frame ${mode}`;
+        },
+        toggleFullscreen() {
+          const a = document.getElementById("app");
+          if (a) a.classList.toggle("fullscreen");
+        },
+        showToast(msg, err = false) {
+          const t = document.getElementById("toast");
+          const m = document.getElementById("toast-msg");
+          if (!t || !m) return;
+          m.innerText = msg;
+          t.querySelector("i").className = err
+            ? "fas fa-skull text-rose-500"
+            : "fas fa-check-circle text-emerald-400";
+          t.style.borderColor = err ? "#f43f5e" : "#10b981";
+          t.style.boxShadow = err
+            ? "0 10px 30px rgba(244,63,94,0.3)"
+            : "0 10px 30px rgba(16,185,129,0.3)";
+          t.classList.add("show");
+          setTimeout(() => t.classList.remove("show"), 3500);
+        },
+        showExportModal() {
+          document.getElementById("code-output-wrap").classList.add("hidden");
+          document.getElementById("code-output-wrap").classList.remove("flex");
+          const m = document.getElementById("export-modal");
+          if (m) {
+            m.classList.remove("hidden");
+            setTimeout(() => m.classList.remove("opacity-0"), 10);
+          }
+        },
+        closeModal(id) {
+          const m = document.getElementById(id);
+          if (m) {
+            m.classList.add("opacity-0");
+            setTimeout(() => m.classList.add("hidden"), 300);
+          }
+        },
+
+        renderPanel(tab) {
+          const c = document.getElementById("panel-content");
+          if (!c) return;
+          const s = engine.state;
+          let h = `<div class="space-y-5 pb-24">`;
+
+          // 1. LAYOUT
+          if (tab === "layout") {
+            h += `<div class="bg-[var(--bg-panel)] p-4 rounded-lg border border-white/5 mb-4 relative overflow-hidden">
+              <div class="absolute top-0 right-0 p-3 opacity-10 text-6xl"><i class="fas fa-sitemap"></i></div>
+              <span class="lbl text-sky-400"><i class="fas fa-satellite-dish mr-2"></i> Active Archetype Engine</span>
+              <select class="inp text-xs font-bold" onchange="engine.update('meta.archetype', this.value)">
+                <option value="saas" ${s.meta.archetype === "saas" ? "selected" : ""}>SaaS Landing Platform</option>
+                <option value="commerce" ${s.meta.archetype === "commerce" ? "selected" : ""}>E-Commerce Matrix</option>
+                <option value="blog" ${s.meta.archetype === "blog" ? "selected" : ""}>Tech Media / Blog</option>
+                <option value="chat" ${s.meta.archetype === "chat" ? "selected" : ""}>AI Chat Assistant Mode</option>
+                <option value="portfolio" ${s.meta.archetype === "portfolio" ? "selected" : ""}>Cyber Portfolio</option>
+              </select>
+              <div class="mt-2 text-[9px] text-white/40 leading-relaxed">Archetype shifts automatically inject structural elements like Chat Widgets, Blog Readers, or Cart Overlays into the canvas.</div>
+            </div>`;
+            h += `<div class="grid grid-cols-3 gap-2 mb-6">`;
+            [
+              "navbar",
+              "hero",
+              "features",
+              "hybrid",
+              "blog",
+              "ecommerce",
+              "form",
+              "footer",
+            ].forEach((type) => {
+              h += `<button class="bg-[var(--bg-panel)] hover:bg-sky-500 hover:text-white border border-white/5 py-2.5 rounded text-[10px] font-bold uppercase transition flex flex-col items-center gap-1 shadow" onclick="engine.addSection('${type}')"><i class="fas fa-plus text-white/30 block"></i> ${type}</button>`;
+            });
+            h += `</div><div class="h-px bg-gradient-to-r from-transparent via-sky-500/30 to-transparent mb-4"></div>`;
+            s.sections.forEach((sec, i) => {
+              h += `<div class="layer ${sec.enabled ? "active" : ""}">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2"><span class="w-6 h-6 rounded flex items-center justify-center bg-sky-500/10 border border-sky-500/30 text-sky-400 text-[10px]"><i class="fas fa-microchip"></i></span><span class="font-bold text-[11px] uppercase tracking-wider text-white">${sec.type}</span></div>
+                  <div class="flex gap-3 items-center">
+                    <label class="toggle-switch transform scale-90 origin-right"><input type="checkbox" ${sec.enabled ? "checked" : ""} onchange="engine.update('sections[${i}].enabled', this.checked)"><span class="slider"></span></label>
+                    <button class="text-white/40 hover:text-sky-400 transition" onclick="engine.duplicateSection(${i})"><i class="fas fa-copy"></i></button>
+                    <button class="text-white/40 hover:text-rose-500 transition" onclick="engine.state.sections.splice(${i},1); engine.update('sections', engine.state.sections);"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+                <div class="flex gap-1">
+                  <button class="flex-1 bg-black/40 hover:bg-sky-500/20 py-1.5 rounded text-white/50 text-xs border border-white/5 transition" onclick="engine.moveSection(${i},-1)"><i class="fas fa-chevron-up"></i></button>
+                  <button class="flex-1 bg-black/40 hover:bg-sky-500/20 py-1.5 rounded text-white/50 text-xs border border-white/5 transition" onclick="engine.moveSection(${i},1)"><i class="fas fa-chevron-down"></i></button>
+                </div>
+              </div>`;
+            });
+          }
+
+          // 2. CONTENT
+          else if (tab === "content") {
+            h += `<div class="text-[10px] text-sky-400/80 mb-4 bg-sky-500/10 p-3 rounded border border-sky-500/20"><i class="fas fa-magic mr-1"></i> Hint: Double-click any text inside the preview canvas for instant inline-editing.</div>`;
+            s.sections.forEach((sec, i) => {
+              if (!sec.enabled) return;
+              h += `<div class="bg-[var(--bg-panel)] p-5 rounded-xl border border-white/5 shadow-lg relative overflow-hidden mb-4">
+                <div class="font-extrabold text-xs uppercase text-sky-400 mb-4 border-b border-white/5 pb-2 flex items-center gap-2"><i class="fas fa-terminal"></i> ${sec.type} Node Data</div>`;
+
+              Object.keys(sec.d).forEach((k) => {
+                if (
+                  [
+                    "spacing",
+                    "style",
+                    "motion",
+                    "items",
+                    "inputs",
+                    "elements",
+                    "posts",
+                    "grid",
+                  ].includes(k) ||
+                  k.endsWith("_act")
+                )
+                  return;
+                const v = sec.d[k];
+                const isMedia = k.includes("img") || k.includes("logo");
+                h += `<div class="mb-4"><span class="lbl">${k.replace(/_/g, " ")}</span><div class="flex gap-2">
+                  <input type="text" class="inp flex-1" value="${v}" oninput="engine.update('sections[${i}].d.${k}', this.value)">
+                  ${isMedia ? `<button class="action-btn" onclick="engine.uploadTarget='sections[${i}].d.${k}'; document.getElementById('upload').click();"><i class="fas fa-folder-open"></i></button>` : ""}
+                </div></div>`;
+              });
+
+              // Arrays (Items, Form Inputs, Posts)
+              ["items", "inputs", "posts"].forEach((arrK) => {
+                if (sec.d[arrK]) {
+                  h += `<div class="mt-4 pt-4 border-t border-white/5"><span class="lbl text-indigo-400">${arrK} Records</span>`;
+                  sec.d[arrK].forEach((it, idx) => {
+                    h += `<div class="bg-black/30 p-4 rounded mt-2 border-l-2 border-indigo-500 relative group">
+                      <button class="absolute top-2 right-2 text-white/30 hover:text-rose-500 text-xs opacity-0 group-hover:opacity-100 transition" onclick="engine.state.sections[${i}].d.${arrK}.splice(${idx},1); engine.update('sections', engine.state.sections);"><i class="fas fa-times"></i></button>`;
+                    Object.keys(it).forEach((ik) => {
+                      if (typeof it[ik] === "boolean") {
+                        h += `<div class="mb-3 flex items-center justify-between"><span class="text-[9px] text-indigo-300 font-bold uppercase tracking-wider">${ik} (Required)</span><input type="checkbox" ${it[ik] ? "checked" : ""} onchange="engine.update('sections[${i}].d.${arrK}[${idx}].${ik}', this.checked)"></div>`;
+                      } else {
+                        const isArrMedia = ik.includes("img");
+                        h += `<div class="mb-3"><span class="text-[9px] text-indigo-300 font-bold uppercase tracking-wider">${ik}</span>
+                          <div class="flex gap-1"><input type="text" class="inp py-1.5 text-xs bg-[var(--bg-master)] border-white/5" value="${it[ik]}" oninput="engine.update('sections[${i}].d.${arrK}[${idx}].${ik}', this.value)">
+                          ${isArrMedia ? `<button class="action-btn !w-8 !h-8" onclick="engine.uploadTarget='sections[${i}].d.${arrK}[${idx}].${ik}'; document.getElementById('upload').click();"><i class="fas fa-upload text-xs"></i></button>` : ""}</div></div>`;
+                      }
+                    });
+                    h += `</div>`;
+                  });
+                  h += `<button class="w-full mt-3 py-2 border border-dashed border-white/10 text-white/50 text-xs hover:border-indigo-500 hover:text-indigo-400 rounded transition font-bold tracking-widest uppercase" onclick="engine.state.sections[${i}].d.${arrK}.push(JSON.parse(JSON.stringify(engine.state.sections[${i}].d.${arrK}[0] || {}))); engine.update('sections', engine.state.sections);"><i class="fas fa-plus mr-1"></i> Append Item</button></div>`;
+                }
+              });
+
+              // Hybrid Elements
+              if (sec.type === "hybrid") {
+                h += `<div class="mt-4 pt-4 border-t border-white/5"><span class="lbl text-emerald-400">Grid Elements Schema</span>
+                  <select class="inp text-xs mb-4" onchange="engine.update('sections[${i}].d.grid', this.value)">
+                    <option value="grid-cols-1" ${sec.d.grid === "grid-cols-1" ? "selected" : ""}>1 Column (Full Width)</option>
+                    <option value="grid-cols-1 md:grid-cols-2" ${sec.d.grid === "grid-cols-1 md:grid-cols-2" ? "selected" : ""}>2 Columns (50/50)</option>
+                    <option value="grid-cols-1 md:grid-cols-3" ${sec.d.grid === "grid-cols-1 md:grid-cols-3" ? "selected" : ""}>3 Columns (33/33/33)</option>
+                    <option value="grid-cols-1 md:grid-cols-12" ${sec.d.grid === "grid-cols-1 md:grid-cols-12" ? "selected" : ""}>12-Column Custom Matrix</option>
+                  </select>`;
+                sec.d.elements.forEach((el, idx) => {
+                  h += `<div class="bg-black/30 p-4 rounded mt-2 border-l-2 border-emerald-500 relative group">
+                    <button class="absolute top-2 right-2 text-white/30 hover:text-rose-500 text-xs opacity-0 group-hover:opacity-100 transition" onclick="engine.state.sections[${i}].d.elements.splice(${idx},1); engine.update('sections', engine.state.sections);"><i class="fas fa-times"></i></button>
+                    <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mb-3"><i class="fas fa-atom mr-1"></i> Block: ${el.type}</span>`;
+                  if (el.type === "text" || el.type === "blockquote") {
+                    h += `<textarea class="inp h-24 text-xs font-mono" oninput="engine.update('sections[${i}].d.elements[${idx}].content', this.value)">${el.content}</textarea>`;
+                  } else if (el.type === "video") {
+                    h += `<input type="text" class="inp text-xs mb-3" placeholder="MP4/URL" value="${el.src}" oninput="engine.update('sections[${i}].d.elements[${idx}].src', this.value)">
+                          <label class="flex items-center gap-2 text-xs text-white/70"><input type="checkbox" ${el.autoplay ? "checked" : ""} onchange="engine.update('sections[${i}].d.elements[${idx}].autoplay', this.checked)"> Autoplay & Muted</label>`;
+                  } else if (el.type === "icon_block") {
+                    h += `<input type="text" class="inp text-xs mb-2" placeholder="Icon (fas fa-cube)" value="${el.icon}" oninput="engine.update('sections[${i}].d.elements[${idx}].icon', this.value)">
+                          <input type="text" class="inp text-xs mb-2" placeholder="Title" value="${el.title}" oninput="engine.update('sections[${i}].d.elements[${idx}].title', this.value)">
+                          <textarea class="inp h-16 text-xs" oninput="engine.update('sections[${i}].d.elements[${idx}].desc', this.value)">${el.desc}</textarea>`;
+                  }
+                  h += `<div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/5">
+                    <div><span class="lbl text-[8px]">Col Span</span><input type="text" class="inp text-xs py-1" value="${el.col_span || ""}" oninput="engine.update('sections[${i}].d.elements[${idx}].col_span', this.value)"></div>
+                    <div><span class="lbl text-[8px]">Padding T/B/L/R</span><div class="flex gap-1">
+                      <input type="number" class="inp px-1 text-[8px] text-center" value="${el.pt || 0}" oninput="engine.update('sections[${i}].d.elements[${idx}].pt', parseInt(this.value))">
+                      <input type="number" class="inp px-1 text-[8px] text-center" value="${el.pb || 0}" oninput="engine.update('sections[${i}].d.elements[${idx}].pb', parseInt(this.value))">
+                      <input type="number" class="inp px-1 text-[8px] text-center" value="${el.pl || 0}" oninput="engine.update('sections[${i}].d.elements[${idx}].pl', parseInt(this.value))">
+                      <input type="number" class="inp px-1 text-[8px] text-center" value="${el.pr || 0}" oninput="engine.update('sections[${i}].d.elements[${idx}].pr', parseInt(this.value))">
+                    </div></div>
+                  </div></div>`;
+                });
+                h += `<div class="grid grid-cols-4 gap-2 mt-4">
+                  <button class="bg-[var(--bg-master)] text-white/50 text-[10px] py-2 rounded border border-white/5 hover:border-emerald-500 transition" onclick="engine.state.sections[${i}].d.elements.push({type:'text', content:'<p>New Text</p>'}); engine.update('sections', engine.state.sections);"><i class="fas fa-font"></i></button>
+                  <button class="bg-[var(--bg-master)] text-white/50 text-[10px] py-2 rounded border border-white/5 hover:border-emerald-500 transition" onclick="engine.state.sections[${i}].d.elements.push({type:'video', src:'', autoplay:true}); engine.update('sections', engine.state.sections);"><i class="fas fa-video"></i></button>
+                  <button class="bg-[var(--bg-master)] text-white/50 text-[10px] py-2 rounded border border-white/5 hover:border-emerald-500 transition" onclick="engine.state.sections[${i}].d.elements.push({type:'icon_block', icon:'fas fa-cube', title:'New', desc:'Desc'}); engine.update('sections', engine.state.sections);"><i class="fas fa-cube"></i></button>
+                  <button class="bg-[var(--bg-master)] text-white/50 text-[10px] py-2 rounded border border-white/5 hover:border-emerald-500 transition" onclick="engine.state.sections[${i}].d.elements.push({type:'blockquote', content:'Quote text...'}); engine.update('sections', engine.state.sections);"><i class="fas fa-quote-right"></i></button>
+                </div></div>`;
+              }
+              h += `</div>`;
+            });
+          }
+
+          // 3. DESIGN
+          else if (tab === "design") {
+            h += `<div class="bg-[var(--bg-panel)] p-5 rounded-xl border border-sky-500/20 mb-5 shadow-lg">
+              <div class="font-extrabold text-xs uppercase text-sky-400 mb-4 border-b border-white/10 pb-2"><i class="fas fa-paint-roller"></i> Global Matrix Presets</div>
+              <div class="grid grid-cols-2 gap-3 mb-5">
+                <button class="preset-btn bg-[#020408] rounded p-3 flex items-center justify-between" onclick="engine.applyPreset('matrix')"><span class="text-xs font-bold text-slate-200">Matrix Cyber</span><span class="w-4 h-4 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e]"></span></button>
+                <button class="preset-btn bg-[#111827] rounded p-3 flex items-center justify-between" onclick="engine.applyPreset('nordic')"><span class="text-xs font-bold text-slate-200">Nordic Frost</span><span class="w-4 h-4 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa]"></span></button>
+                <button class="preset-btn bg-[#0a0a0c] rounded p-3 flex items-center justify-between" onclick="engine.applyPreset('royal')"><span class="text-xs font-bold text-slate-200">Luxury Gold</span><span class="w-4 h-4 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]"></span></button>
+                <button class="preset-btn bg-[#1e1b4b] rounded p-3 flex items-center justify-between" onclick="engine.applyPreset('tokyo')"><span class="text-xs font-bold text-slate-200">Tokyo Synth</span><span class="w-4 h-4 rounded-full bg-lime-500 shadow-[0_0_10px_#84cc16]"></span></button>
+              </div>
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div><span class="lbl">Header Typography</span><select class="inp text-xs font-bold" onchange="engine.update('theme.headerFont', this.value)">${["Space Grotesk", "Outfit", "Plus Jakarta Sans", "Inter", "Montserrat", "Playfair Display", "Fira Code"].map((f) => `<option value="${f}" ${s.theme.headerFont === f ? "selected" : ""}>${f}</option>`).join("")}</select></div>
+                <div><span class="lbl">Body Typography</span><select class="inp text-xs font-bold" onchange="engine.update('theme.bodyFont', this.value)">${["Space Grotesk", "Outfit", "Plus Jakarta Sans", "Inter", "Montserrat", "Playfair Display", "Fira Code"].map((f) => `<option value="${f}" ${s.theme.bodyFont === f ? "selected" : ""}>${f}</option>`).join("")}</select></div>
+              </div>
+              <div class="grid grid-cols-3 gap-x-3 gap-y-3 mt-4 border-t border-white/5 pt-4">
+                ${Object.entries(s.theme.colors)
+                  .map(
+                    ([k, v]) =>
+                      `<div><span class="lbl text-[8px]">${k}</span><div class="flex items-center gap-1 bg-black/30 p-1 rounded"><input type="color" value="${v.startsWith("rgba") ? "#ffffff" : v}" oninput="engine.update('theme.colors.${k}', this.value)" class="w-5 h-5"><input type="text" class="inp flex-1 px-1 py-1 text-[8px] font-mono bg-transparent" value="${v}" oninput="engine.update('theme.colors.${k}', this.value)"></div></div>`,
+                  )
+                  .join("")}
+              </div>
+            </div>`;
+
+            // Granular Section Adjustments
+            s.sections.forEach((sec, i) => {
+              if (!sec.enabled) return;
+              const d = sec.d;
+              let actHtml = "";
+              Object.keys(d).forEach((k) => {
+                if (k.endsWith("_act")) {
+                  const val = d[k];
+                  actHtml += `<div class="mb-3 pt-2 border-t border-white/5"><span class="lbl text-amber-400">${k.replace("_act", "")} Target Route</span><select class="inp mb-2 text-[10px]" onchange="engine.update('sections[${i}].d.${k}', this.value)"><option value="">No Route</option><option value="cart" ${val === "cart" ? "selected" : ""}>Open Cart</option><option value="lead_modal" ${val === "lead_modal" ? "selected" : ""}>Open Form</option><option value="url:" ${val.startsWith("url:") ? "selected" : ""}>URL Redirect</option><optgroup label="Nodes">${s.sections.map((sd, di) => `<option value="scroll:${sd.type}_${di}" ${val === `scroll:${sd.type}_${di}` ? "selected" : ""}>${sd.type} Node</option>`).join("")}</optgroup></select>${val.startsWith("url:") ? `<input type="text" class="inp text-[10px] font-mono" value="${val.substring(4)}" oninput="engine.update('sections[${i}].d.${k}', 'url:'+this.value)">` : ""}</div>`;
+                }
+              });
+
+              h += `<div class="bg-[var(--bg-panel)] p-5 rounded-xl border border-white/5 mb-4 shadow relative">
+                <div class="font-extrabold text-[10px] uppercase text-indigo-400 mb-3 tracking-widest flex justify-between"><i class="fas fa-cube"></i> ${sec.type} node config</div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                  <div><span class="lbl text-[9px]">BG Color</span><div class="flex gap-1"><input type="color" value="${d.style.bg_col.startsWith("var") ? "#000000" : d.style.bg_col}" oninput="engine.update('sections[${i}].d.style.bg_col', this.value)" class="w-6 h-6 rounded border-none bg-transparent"><input type="text" class="inp px-1 text-[9px] font-mono" value="${d.style.bg_col}" oninput="engine.update('sections[${i}].d.style.bg_col', this.value)"></div></div>
+                  <div><span class="lbl text-[9px]">Text Color</span><div class="flex gap-1"><input type="color" value="${d.style.txt_col.startsWith("var") ? "#ffffff" : d.style.txt_col}" oninput="engine.update('sections[${i}].d.style.txt_col', this.value)" class="w-6 h-6 rounded border-none bg-transparent"><input type="text" class="inp px-1 text-[9px] font-mono" value="${d.style.txt_col}" oninput="engine.update('sections[${i}].d.style.txt_col', this.value)"></div></div>
+                </div>
+
+                <div class="bg-black/30 p-2 rounded mb-3"><span class="lbl text-[9px] text-fuchsia-400">Absolute Spacing (Padding | Margin) px</span><div class="grid grid-cols-4 gap-1">
+                  ${["pt", "pb", "pl", "pr"].map((k) => `<div><span class="lbl text-[8px] text-center">P_${k[1].toUpperCase()}</span><input type="number" class="inp px-1 py-1 text-[9px] text-center" value="${d.spacing[k]}" oninput="engine.update('sections[${i}].d.spacing.${k}', parseInt(this.value))"></div>`).join("")}
+                  ${["mt", "mb", "ml", "mr"].map((k) => `<div><span class="lbl text-[8px] text-center">M_${k[1].toUpperCase()}</span><input type="number" class="inp px-1 py-1 text-[9px] text-center" value="${d.spacing[k]}" oninput="engine.update('sections[${i}].d.spacing.${k}', parseInt(this.value))"></div>`).join("")}
+                </div></div>
+
+                <div class="bg-black/30 p-2 rounded mb-3"><span class="lbl text-[9px] text-emerald-400">Motion & Interaction Physics</span><div class="grid grid-cols-2 gap-2">
+                  <div class="col-span-2"><span class="lbl text-[8px]">Entrance</span><select class="inp text-[9px] p-1" onchange="engine.update('sections[${i}].d.motion.anim', this.value)"><option value="">None</option>${["fade-up", "fade-down", "fade-left", "zoom-in", "flip-left", "slide-up"].map((a) => `<option value="${a}" ${d.motion.anim === a ? "selected" : ""}>${a}</option>`).join("")}</select></div>
+                  <div><span class="lbl text-[8px]">Duration (ms)</span><input type="number" class="inp p-1 text-[9px]" value="${d.motion.dur}" oninput="engine.update('sections[${i}].d.motion.dur', parseInt(this.value))"></div>
+                  <div><span class="lbl text-[8px]">Delay (ms)</span><input type="number" class="inp p-1 text-[9px]" value="${d.motion.del}" oninput="engine.update('sections[${i}].d.motion.del', parseInt(this.value))"></div>
+                  <div class="col-span-2"><span class="lbl text-[8px]">Hover Micro-Interaction</span><select class="inp text-[9px] p-1" onchange="engine.update('sections[${i}].d.motion.hover', this.value)"><option value="none" ${d.motion.hover === "none" ? "selected" : ""}>None</option><option value="scale-lift" ${d.motion.hover === "scale-lift" ? "selected" : ""}>Floating Scale Lift</option><option value="3d-tilt" ${d.motion.hover === "3d-tilt" ? "selected" : ""}>3D Spatial Tilt</option><option value="float-glow" ${d.motion.hover === "float-glow" ? "selected" : ""}>Radiant Neon Glow</option><option value="border-draw" ${d.motion.hover === "border-draw" ? "selected" : ""}>Border Trace Draw</option><option value="matte" ${d.motion.hover === "matte" ? "selected" : ""}>Matte Opacity</option></select></div>
+                </div></div>
+                ${actHtml}
+              </div>`;
+            });
+
+            h += `<div class="bg-[var(--bg-panel)] p-5 rounded-xl border border-white/5 shadow"><div class="font-extrabold text-xs uppercase text-emerald-400 mb-3"><i class="fab fa-css3-alt"></i> CSS Hook Injection</div><textarea class="code-editor" onblur="engine.update('custom.css', this.value)">${s.custom.css}</textarea></div>`;
+          }
+
+          // 4. COMMERCE & LOGIC
+          else if (tab === "commerce") {
+            h += `<div class="bg-[var(--bg-panel)] p-6 rounded-xl border border-fuchsia-500/20 shadow-lg">
+              <div class="font-extrabold text-xl text-fuchsia-400 mb-6 border-b border-white/10 pb-4"><i class="fas fa-network-wired"></i> Transaction Routing</div>
+              <div class="mb-4"><span class="lbl">Global Currency Token</span><input type="text" class="inp text-xl font-black w-24 text-center text-fuchsia-400 bg-black/40" value="${s.ecommerce.currency}" oninput="engine.update('ecommerce.currency', this.value)"></div>
+              <div class="bg-black/20 p-4 rounded-lg border border-white/5"><span class="lbl text-emerald-400 mb-2">Endpoint Processor</span><select class="inp text-sm font-bold mb-4" onchange="engine.update('ecommerce.gateway', this.value)"><option value="whatsapp" ${s.ecommerce.gateway === "whatsapp" ? "selected" : ""}>WhatsApp Integration</option><option value="telegram" ${s.ecommerce.gateway === "telegram" ? "selected" : ""}>Telegram Bot API</option><option value="webhook" ${s.ecommerce.gateway === "webhook" ? "selected" : ""}>Custom POST Webhook</option></select>
+              ${s.ecommerce.gateway === "whatsapp" ? `<div><span class="lbl text-[9px]">Target Phone Number</span><input type="text" class="inp font-mono text-xs" value="${s.ecommerce.whatsapp_num}" oninput="engine.update('ecommerce.whatsapp_num', this.value)"></div>` : s.ecommerce.gateway === "telegram" ? `<div class="mb-2"><span class="lbl text-[9px]">Bot Token Key</span><input type="password" class="inp font-mono text-xs" value="${s.ecommerce.telegram_token}" onblur="engine.update('ecommerce.telegram_token', this.value)"></div><div><span class="lbl text-[9px]">Chat ID</span><input type="text" class="inp font-mono text-xs" value="${s.ecommerce.telegram_chat_id}" oninput="engine.update('ecommerce.telegram_chat_id', this.value)"></div>` : `<div><span class="lbl text-[9px]">Webhook URL</span><input type="text" class="inp font-mono text-xs" value="${s.ecommerce.webhook_url}" oninput="engine.update('ecommerce.webhook_url', this.value)"></div>`}
+              </div>
+            </div>`;
+          }
+
+          // 5. SEO & RTL
+          else if (tab === "seo") {
+            h += `<div class="bg-[var(--bg-panel)] p-6 rounded-xl border border-emerald-500/20 shadow-lg space-y-4">
+              <div class="font-extrabold text-xl text-emerald-400 mb-2 border-b border-white/10 pb-4"><i class="fas fa-globe"></i> SEO & Internationalization</div>
+              <div class="grid grid-cols-2 gap-4 bg-emerald-500/10 p-3 rounded border border-emerald-500/20">
+                <div><span class="lbl">Language (lang)</span><input type="text" class="inp text-center text-xs" value="${s.meta.lang}" oninput="engine.update('meta.lang', this.value)"></div>
+                <div><span class="lbl">Document Direction</span><select class="inp text-center font-bold text-xs" onchange="engine.update('meta.dir', this.value)"><option value="ltr" ${s.meta.dir === "ltr" ? "selected" : ""}>LTR (English)</option><option value="rtl" ${s.meta.dir === "rtl" ? "selected" : ""}>RTL (Persian/Arabic)</option></select></div>
+              </div>
+              <div><span class="lbl">Page Title</span><input type="text" class="inp text-sm font-bold" value="${s.meta.title}" oninput="engine.update('meta.title', this.value)"></div>
+              <div><span class="lbl">Meta Description</span><textarea class="inp h-20 text-xs" oninput="engine.update('meta.desc', this.value)">${s.meta.desc}</textarea></div>
+              <div><span class="lbl">Schema.org Type</span><select class="inp text-xs" onchange="engine.update('meta.schema_type', this.value)"><option value="WebSite" ${s.meta.schema_type === "WebSite" ? "selected" : ""}>WebSite</option><option value="SoftwareApplication" ${s.meta.schema_type === "SoftwareApplication" ? "selected" : ""}>SaaS</option><option value="LocalBusiness" ${s.meta.schema_type === "LocalBusiness" ? "selected" : ""}>Business</option></select></div>
+              <div class="border-t border-white/10 pt-4"><div class="font-extrabold text-xs uppercase text-indigo-400 mb-3"><i class="fas fa-share-alt"></i> Open Graph Sandbox</div>
+                <div><span class="lbl">OG Image (1200x630)</span><div class="flex gap-2"><input type="text" class="inp text-xs" value="${s.meta.og_img}" oninput="engine.update('meta.og_img', this.value)"><button class="action-btn" onclick="engine.uploadTarget='meta.og_img'; document.getElementById('upload').click();"><i class="fas fa-upload"></i></button></div></div>
+              </div>
+            </div>`;
+          }
+
+          // 6. LEADS
+          else if (tab === "leads") {
+            h += `<div class="bg-[var(--bg-panel)] p-6 rounded-xl border border-sky-500/20 shadow-lg">
+              <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><div class="font-extrabold text-xl text-sky-400"><i class="fas fa-database"></i> Telemetry Matrix</div><button class="b2-btn text-xs bg-sky-600 hover:bg-sky-500 py-2 px-4 shadow-[0_0_15px_rgba(14,165,233,0.3)]" onclick="engine.downloadLeadsCSV()"><i class="fas fa-download mr-2"></i> EXPORT CSV</button></div>
+              <div class="overflow-x-auto rounded border border-white/5 bg-[var(--bg-master)] custom-scroll"><table class="w-full text-left border-collapse text-xs font-mono"><thead><tr class="border-b border-white/10 text-sky-500/70 bg-black/40 uppercase tracking-widest text-[9px]"><th class="p-3">Timestamp</th><th class="p-3">Identity</th><th class="p-3">Node/Email</th><th class="p-3">Payload</th></tr></thead><tbody>
+              ${s.leads.length === 0 ? `<tr><td colspan="4" class="p-8 text-center text-white/20 uppercase">No signals intercepted.</td></tr>` : s.leads.map((l) => `<tr class="border-b border-white/5 hover:bg-sky-900/20 transition"><td class="p-3 text-white/40 whitespace-nowrap">${l.date}</td><td class="p-3 font-bold">${l.name}</td><td class="p-3 text-sky-400">${l.email}</td><td class="p-3 text-white/60 truncate max-w-[200px]">${l.message}</td></tr>`).join("")}
+              </tbody></table></div>
+            </div>`;
+          }
+
+          h += `</div>`;
+          c.innerHTML = h;
+        },
+      };
+
+      engine.init();
+    </script>
+  </body>
+</html>
