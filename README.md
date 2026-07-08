@@ -30,3 +30,11 @@ Welcome to **B2. Omni-Builder v4.0**. This is the evolution of manual web constr
 
 ### 🛡️ Credits & License
 Developed by **Behrad Besharati (BehradB289)**. Distributed under the MIT License.
+
+---
+### 🚀 NEW VERSION AVAILABLE
+We have released **B2. Studio Enterprise Pro AI V18**, the most powerful version yet! 
+This new release includes an integrated AI Copilot, a fully refactored matrix engine, and enhanced export capabilities.
+
+👉 **[Experience the latest version here](https://github.com/BehradB289/B2-Studio-Enterprise-Pro-AI)**
+---
